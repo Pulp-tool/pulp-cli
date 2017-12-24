@@ -1,0 +1,19 @@
+{
+    "name": "mark/pulp-cli",
+    "require": {
+        "react/stream": "^0.7.6",
+        "react/event-loop": "^0.4.3"
+    },
+    "autoload": {
+        "psr-0": { "Pulp\\": "src/"}
+    },
+
+	"bin": ["bin/altax"],
+
+    "authors": [
+        {
+            "name": "Mark Kimsal",
+            "email": "metrofindings@gmail.com"
+        }
+    ]
+}
