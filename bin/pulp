@@ -45,13 +45,15 @@ try {
 	if ($configPath == FALSE && $targetTask != 'init-project') {
 		throw new \NoConfigDirException();
 	} else {
-		if (!include($configPath.'/config.php')) {
-			throw new \NoConfigDirException();
+		if (!@include($configPath.'/config.php')) {
+			$p = new \Pulp\Pulp();
 		}
 	}
 } catch (\NoConfigDirException $e) {
 	echo "Cannot find .pulp/config.php in this directory\n";
 	echo "You can initialize this pulp to work in this project by running pulp.phar init-project\n";
+//	echo "Config Path: ";var_dump($configPath);
+//	echo "Target Task: ";var_dump($targetTask);
 	$p = new \Pulp\Pulp();
 } catch (\Exception $e) {
 	echo "Encountered exception when reading ".$configPath."/config.php\n";
@@ -62,28 +64,9 @@ try {
 class NoConfigDirException extends Exception {}
 
 //define tasks
-$p->task('init-project', function() {
-	exec ('mkdir .pulp');
-$sample = <<<EOL
-<?php                                                                                                                                                                 
-\$p = new \Pulp\Pulp();
+$p->task('init-project', new \Pulp\Task\InitProject());
 
-#\$p->task('build', ['log'], function() {
-#   echo "Building...\\n";
-#});
-#
-#\$t = time();
-#
-#\$p->task('log', function() use (\$t) {
-#   echo "Logging with closure variable: \$t...\\n";
-#});
-EOL;
-	file_put_contents('.pulp/config.php', $sample);
-});
-$p->task('help', function() {
-	echo "Help: run php pulp.phar {task}\n";
-	echo "define tasks in .pulp/config.php\n";
-});
+$p->task('help', new \Pulp\Task\Help());
 
 
 //execute given task or default task
