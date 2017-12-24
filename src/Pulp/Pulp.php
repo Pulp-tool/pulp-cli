@@ -30,6 +30,14 @@ class Pulp {
 		return $w;
 	}
 
+	public function dest($fileList, $opts=NULL) {
+		$d =  new DestList($fileList, $this->loop);
+		$this->loop->futureTick(function() use($d) {
+			$d->resume();
+		});
+		return $d;
+	}
+
 	public function src($fileList, $opts=NULL) {
 		$s =  new SourceList($fileList, $this->loop);
 		$this->loop->futureTick(function() use($s) {
