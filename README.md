@@ -1,4 +1,5 @@
-#pulp
+pulp
+===
 
 pulp is gulp in PHP.
 
@@ -31,3 +32,15 @@ $p->task('watch', function() use($p) {
 $p->exec('build');
 $p->exec('watch');
 ```
+
+Install the phar file
+===
+Download the phar file, make it executable and move it to /usr/local/bin/pulp
+
+Setup your project
+===
+Run pulp init-project to create a .pulp directory and .pulp/config.php file
+
+Write your tasks
+===
+Edit the .pulp/config.php file and create tasks for building your project
