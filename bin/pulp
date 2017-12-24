@@ -75,7 +75,7 @@ $p->task('help', new \Pulp\Task\Help());
 try {
 	$p->exec($targetTask);
 } catch (\Exception $e) {
-	echo 'Error: encountered an exception when trying to execute '.$targetTask."\n";
+	echo 'Error: encountered an exception when trying to execute task \''.$targetTask.'\''.PHP_EOL;
 	echo $e->getMessage()."\n";
 	exit(1);
 }
