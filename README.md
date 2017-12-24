@@ -21,9 +21,9 @@ $p->task('log', function() use ($foo) {
 	echo "Logging with variable: $foo...\n";
 });
 
-//The watch task will either poll or use inotify to detect file changes
+//The watch method will either poll or use inotify to detect file changes
 
-$p->task('watch', function() use($p) {
+$p->task('wait-and-pipe', function() use($p) {
 	$p->watch( ['src/**/*.php', 'foo/**/*.php'])->on('change', function($file) use ($p) {
 		$p->src(['src/', 'foo/'])
 			->pipe(new \Pulp\DataPipe(function($data) {
