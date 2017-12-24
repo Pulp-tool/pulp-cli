@@ -38,19 +38,25 @@ class SourceList extends DataPipe {
 	public function resume() {
 		foreach ($this->sourceList as $_src) {
 
-			$src = $this->findGlobParent($_src);
+			if (strpos($_src, '*') !== FALSE) {
+				$src = $this->findGlobParent($_src);
+			} else {
+				$src = $_src;
+			}
 
 			$src = realpath($this->workdir.'/'.$src).'/';
-			$d = \dir($src);
-			while(FALSE !== ($entry = $d->read())) {
-				if (is_dir($src.$entry)) { continue; }
-				$this->emit('data', [new \SplFileInfo($src.$entry)]);
+			if (is_dir($src)) {
+				$d = \dir($src);
+				while(FALSE !== ($entry = $d->read())) {
+					if (is_dir($src.$entry)) { continue; }
+					$this->emit('data', [new \SplFileInfo($src.$entry)]);
+				}
+			} else {
+					$this->emit('data', [new \SplFileInfo(rtrim($src,'/'))]);
 			}
 		}
-	}
 
-	public function close() {
-		$this->closed = TRUE;
+		$this->end();
 	}
 
 	public function findGlobParent($glob) {
