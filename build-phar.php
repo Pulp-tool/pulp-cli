@@ -5,6 +5,8 @@ $srcRoot    = "src";
 $vendorRoot = "vendor";
 $buildRoot  = "./build";
 $pharFile   = $buildRoot.'/pulp.phar';
+
+exec("rm $pharFile");
  
 $phar = new Phar($pharFile, 
     FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::KEY_AS_FILENAME,
@@ -19,6 +21,10 @@ foreach ($dirRootList as $_root) {
 	$count = 0;
 	foreach ($i as $file) {
 		if ( 0 == strpos( $file->getFilename(), '.')) { continue; }
+		if ( FALSE !== strpos( $file->getFilename(), '.xml.dist')) { continue; }
+		if ( FALSE !== strpos( $file->getPathName(), 'README.md')) { continue; }
+		if ( FALSE !== strpos( $file->getPathName(), 'tests/')) { continue; }
+		if ( FALSE !== strpos( $file->getPathName(), 'examples/')) { continue; }
 		$count++;
 		echo "Processing: ".$file->getPathName()."\n";
 		$phar->addFromString($file->getPathName(), file_get_contents($file));
