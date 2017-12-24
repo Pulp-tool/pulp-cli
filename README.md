@@ -37,6 +37,11 @@ pulp.phar watch
 Install the phar file
 ===
 Download the phar file, make it executable and move it to /usr/local/bin/pulp
+```bash
+wget https://github.com/Pulp-tool/pulp-cli/releases/download/0.4.0/pulp.phar
+chmod a+x pulp.phar
+mv pulp.phar /usr/local/bin
+```
 
 Setup your project
 ===
