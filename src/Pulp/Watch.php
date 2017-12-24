@@ -45,7 +45,7 @@ class Watch extends EventEmitter {
 			}
 
 			foreach ($changedList as $filename) {
-				$this->emit('change', [$filename]);
+				$this->emit('change', [new \SplFileInfo($filename)]);
 			}
 		});
 	}
@@ -78,7 +78,7 @@ class Watch extends EventEmitter {
 				$filename = $parentPath.$_in['name'];
 				if ($this->fileMatchesGlob($_in['name'], $wdToGlob[$_in['wd']])) {
 					if ($_in['mask'] & IN_MODIFY) {
-						$this->emit('change', [$filename]);
+						$this->emit('change', [new \SplFileInfo($filename)]);
 					}
 				}
 			}

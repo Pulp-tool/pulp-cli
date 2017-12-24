@@ -44,7 +44,7 @@ class SourceList extends DataPipe {
 			$d = \dir($src);
 			while(FALSE !== ($entry = $d->read())) {
 				if (is_dir($src.$entry)) { continue; }
-				$this->emit('data', [$src.$entry]);
+				$this->emit('data', [new \SplFileInfo($src.$entry)]);
 			}
 		}
 	}
