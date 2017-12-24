@@ -10,6 +10,7 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 	use \Evenement\EventEmitterTrait;
 
 	public $writeCallback;
+	public $closed = FALSE;
 
 	public function __construct($writeCallable) {
 		$this->writeCallback = $writeCallable;
@@ -17,10 +18,16 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 
 	public function pause() {
 	}
+
 	public function end($data=null) {
+		$this->close();
+		$this->emit('end');
 	}
+
 	public function close() {
+		$this->closed = TRUE;
 	}
+
 	public function resume() {
 	}
 
