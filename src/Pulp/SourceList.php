@@ -7,7 +7,7 @@ use React\Stream\WritableStreamInterface;
 use React\Stream\Util;
 use Evenement\EventEmitterTrait;
 
-class SourceList implements \React\Stream\ReadableStreamInterface {
+class SourceList extends DataPipe {
 
 	use EventEmitterTrait;
 
@@ -27,20 +27,7 @@ class SourceList implements \React\Stream\ReadableStreamInterface {
 		}
 	}
 
-	/**
-	 * check if source dir is readable 
-	 */
-	public function isReadable() {
-		return TRUE;
-	}
-
-	public function pause() {
-		//do nothing
-	}
-
-
-    public function pipe(WritableStreamInterface $dest, array $options = array())
-    {
+    public function pipe(WritableStreamInterface $dest, array $options = array()) {
         return Util::pipe($this, $dest, $options);
     }
 
