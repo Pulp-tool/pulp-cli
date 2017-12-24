@@ -27,8 +27,14 @@ EOL;
 
 $sample = <<<EOL
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:Pulp-tool/pulp-less.git"
+        }
+    ],
     "require": {
-		"pulp/watch": "*"
+        "pulp-less": "*"
      }
 }
 EOL;
