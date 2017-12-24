@@ -27,10 +27,11 @@ $p->task('watch', function() use($p) {
 		echo "File changed: ".$file." ...\n";
 	});
 });
+```
 
-
-$p->exec('build');
-$p->exec('watch');
+```bash
+pulp.phar build
+pulp.phar watch
 ```
 
 Install the phar file
