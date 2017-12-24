@@ -45,7 +45,15 @@ mv pulp.phar /usr/local/bin
 
 Setup your project
 ===
-Run pulp init-project to create a .pulp directory and .pulp/config.php file
+Run pulp init-project to create a .pulp directory, a config.php file and a composer.json file.
+
+```bash
+.pulp/
+   config.php # <== tasks go here
+   composer.json # <== pulp plugins go here
+```
+
+CD into the .pulp directory and run *composer install*
 
 Write your tasks
 ===
