@@ -1,5 +1,7 @@
 {
-    "name": "mark/pulp-cli",
+    "name": "Pulp-tool/pulp-cli",
+	"version": "0.4.0",
+
     "require": {
         "react/stream": "^0.7.6",
         "react/event-loop": "^0.4.3"
