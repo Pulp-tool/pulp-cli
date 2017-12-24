@@ -45,8 +45,10 @@ try {
 	if ($configPath == FALSE && $targetTask != 'init-project') {
 		throw new \NoConfigDirException();
 	} else {
+		$x = @include($configPath.'/vendor/autoload.php');
 		if (!@include($configPath.'/config.php')) {
 			$p = new \Pulp\Pulp();
+		} else {
 		}
 	}
 } catch (\NoConfigDirException $e) {
