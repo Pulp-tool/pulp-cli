@@ -1,0 +1,96 @@
+#!/usr/bin/env php
+<?php
+
+if (file_exists( dirname( __DIR__) .'/vendor/autoload.php')) {
+	include(dirname( __DIR__) .'/vendor/autoload.php');
+} else {
+	include( __DIR__ .'/../vendor/autoload.php');
+}
+//read in .pulp/config.php
+
+$path = getcwd();
+
+$configPath = findConfigDir('.pulp', $path);
+
+$targetTask = parseFlags();
+if ($targetTask == FALSE) {
+	$targetTask = 'help';
+}
+
+function parseFlags() {
+	global $argv;
+	if (!isset($argv[1])){
+		return FALSE;
+	}
+	return $argv[1];
+}
+function findConfigDir($dirName, $startingPath) {
+
+	do {
+		$d = dir($startingPath);
+
+		while(FALSE !== ($entry = $d->read())) {
+			if ($entry == $dirName) {
+				return $startingPath.'/'.$dirName;
+			}
+		}
+		$startingPath = dirname($startingPath);
+	} while (strlen($startingPath) > 1);
+
+	return FALSE;
+}
+
+try {
+
+	if ($configPath == FALSE && $targetTask != 'init-project') {
+		throw new \NoConfigDirException();
+	} else {
+		if (!include($configPath.'/config.php')) {
+			throw new \NoConfigDirException();
+		}
+	}
+} catch (\NoConfigDirException $e) {
+	echo "Cannot find .pulp/config.php in this directory\n";
+	echo "You can initialize this pulp to work in this project by running pulp.phar init-project\n";
+	$p = new \Pulp\Pulp();
+} catch (\Exception $e) {
+	echo "Encountered exception when reading ".$configPath."/config.php\n";
+	echo $e->getMessage()."\n";
+	exit(1);
+}
+
+class NoConfigDirException extends Exception {}
+
+//define tasks
+$p->task('init-project', function() {
+	exec ('mkdir .pulp');
+$sample = <<<EOL
+<?php                                                                                                                                                                 
+\$p = new \Pulp\Pulp();
+
+#\$p->task('build', ['log'], function() {
+#   echo "Building...\\n";
+#});
+#
+#\$t = time();
+#
+#\$p->task('log', function() use (\$t) {
+#   echo "Logging with closure variable: \$t...\\n";
+#});
+EOL;
+	file_put_contents('.pulp/config.php', $sample);
+});
+$p->task('help', function() {
+	echo "Help: run php pulp.phar {task}\n";
+	echo "define tasks in .pulp/config.php\n";
+});
+
+
+//execute given task or default task
+try {
+	$p->exec($targetTask);
+} catch (\Exception $e) {
+	echo 'Error: encountered an exception when trying to execute '.$targetTask."\n";
+	echo $e->getMessage()."\n";
+	exit(1);
+}
