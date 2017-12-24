@@ -25,13 +25,14 @@ $p->task('log', function() use ($foo) {
 
 $p->task('wait-and-pipe', function() use($p) {
 	$p->watch( ['src/**/*.php', 'foo/**/*.php'])->on('change', function($file) use ($p) {
+		//this will pipe *all* files in src/ and foo/, not just the ones that changed
 		$p->src(['src/', 'foo/'])
 			->pipe(new \Pulp\DataPipe(function($data) {
 				echo "Data Pipe got "; var_dump($data);
 			})
 		);
 			
-		echo "File changed: ".$file." ...\n";
+		echo "This file triggered the change event: ".$file." ...\n";
 	});
 });
 ```
