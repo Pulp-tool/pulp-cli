@@ -6,15 +6,22 @@ pulp is gulp in PHP.
 ```php
 $p = new \Pulp\Pulp();
 
+//The log task is a dependency of the build task.
+//This will run the log task before running the build task
+
 $p->task('build', ['log'], function() {
 	echo "Building...\n";
 });
 
-$foo = time();
 
+//The log task is a regular closure
+
+$foo = time();
 $p->task('log', function() use ($foo) {
 	echo "Logging with variable: $foo...\n";
 });
+
+//The watch task will either poll or use inotify to detect file changes
 
 $p->task('watch', function() use($p) {
 	$p->watch( ['src/**/*.php', 'foo/**/*.php'])->on('change', function($file) use ($p) {
