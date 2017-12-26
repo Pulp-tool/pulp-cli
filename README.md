@@ -1,7 +1,15 @@
-pulp
+Install
 ===
+Download the phar file, make it executable and move it to /usr/local/bin/pulp
+```bash
+wget https://github.com/Pulp-tool/pulp-cli/releases/download/0.5.1/pulp.phar
+chmod a+x pulp.phar
+mv pulp.phar /usr/local/bin
+```
 
-pulp is gulp in PHP.
+Use
+===
+Create tasks and watchers, pipe data from src() to dest()
 
 ```php
 $p = new \Pulp\Pulp();
@@ -38,17 +46,8 @@ $p->task('wait-and-pipe', function() use($p) {
 ```
 
 ```bash
-pulp.phar build
-pulp.phar watch
-```
-
-Install the phar file
-===
-Download the phar file, make it executable and move it to /usr/local/bin/pulp
-```bash
-wget https://github.com/Pulp-tool/pulp-cli/releases/download/0.5.1/pulp.phar
-chmod a+x pulp.phar
-mv pulp.phar /usr/local/bin
+pulp build
+pulp watch
 ```
 
 Setup your project
@@ -63,6 +62,4 @@ Run pulp init-project to create a .pulp directory, a config.php file and a compo
 
 CD into the .pulp directory and run *composer install*
 
-Write your tasks
-===
-Edit the .pulp/config.php file and create tasks for building your project
+Edit config.php and create your own build pipeline
