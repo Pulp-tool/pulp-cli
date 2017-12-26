@@ -28,7 +28,9 @@ class DestList extends DataPipe {
 	}
 
 	public function write($data) {
-		foreach ($this->destList as $_dest);
-		file_put_contents($this->workdir.'/'.$_dest, $data);
+		foreach ($this->destList as $_dest) {
+			file_put_contents($this->workdir.'/'.$_dest, $data);
+			$this->emit('end', [new \SplFileInfo($this->workdir.'/'.$_dest)]);
+		}
 	}
 }
