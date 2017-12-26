@@ -11,12 +11,14 @@ class Watch extends EventEmitter {
 
 	public $inotifyFd;
 	public $loop;
-	public $wdToRealPath = [];
-	public $wdToGlob     = [];
-	public $fsWatcherList  = [];
+	public $wdToRealPath  = [];
+	public $wdToGlob      = [];
+	public $fsWatcherList = [];
+	public $cwd;
 
 	public function __construct($fileList, $loop) {
 
+		$this->cwd = getcwd();
 		if (extension_loaded('inotify')) {
 			$this->setupInofity($fileList, $loop);
 		} else {
@@ -33,19 +35,22 @@ class Watch extends EventEmitter {
 				throw new \Exception("No such directory found for glob pattern: $_filePattern");
 			}
 			$realParent .= '/';
-			$this->fsWatcherList[]   = new Fs\PollWatcher($realParent);
+			$this->fsWatcherList[$_filePattern]   = new Fs\PollWatcher($realParent);
 		}
 
 		$watcherList = $this->fsWatcherList;
 
 		$loop->addPeriodicTimer(1.03, function() use ($watcherList) {
 
-			foreach ($watcherList as $_w) {
+			foreach ($watcherList as $_glob=>$_w) {
 				$changedList = $_w->findChangedFiles();
 			}
 
 			foreach ($changedList as $filename) {
-				$this->emit('change', [new \SplFileInfo($filename)]);
+				$filenameShort = ltrim(str_replace($this->cwd, '', $filename), '/');
+				if ($this->fileMatchesGlob($filenameShort, $_glob)) {
+					$this->emit('change', [new \SplFileInfo($filename)]);
+				}
 			}
 		});
 	}
@@ -106,6 +111,32 @@ class Watch extends EventEmitter {
 	}
 
 	public function fileMatchesGlob($name, $glob) {
-		return TRUE;
+		$regex     = '|(foo/)([./]*)((.+)\.css)|';
+		$matches   = [];
+		$globParts = explode('/', $glob);
+		$regex     = '|';
+		foreach ($globParts as $_p) {
+			if (strpos($_p, '**') !== FALSE) {
+				$regex .= '([./]*)';
+				continue;
+			}
+			if (strpos($_p, '*') !== FALSE) {
+				$_p     = str_replace('.', '\.', $_p);
+				$regex .= '((.+)'.$_p.')';
+				continue;
+			}
+			$regex .= '('.$_p.')/';
+		}
+		$regex .= '|';
+
+		$x = preg_match($regex, $name, $matches);
+		/*
+		echo "Glob:  $glob \n";
+		echo "Regex: $regex \n";
+		echo "Name:  $name \n";
+		var_dump($x);
+		var_dump($matches);
+		*/
+		return $x;
 	}
 }
