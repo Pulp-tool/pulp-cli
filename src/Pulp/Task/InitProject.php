@@ -30,10 +30,15 @@ $sample = <<<EOL
     "repositories": [
         {
             "type": "vcs",
+            "url": "git@github.com:Pulp-tool/pulp-livereload.git"
+        },
+        {
+            "type": "vcs",
             "url": "git@github.com:Pulp-tool/pulp-less.git"
         }
     ],
     "require": {
+        "pulp-livereload": "*",
         "pulp-less": "*"
      }
 }
