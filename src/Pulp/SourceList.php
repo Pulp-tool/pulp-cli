@@ -27,9 +27,6 @@ class SourceList extends DataPipe {
 		}
 	}
 
-    public function pipe(WritableStreamInterface $dest, array $options = array()) {
-        return Util::pipe($this, $dest, $options);
-    }
 
 	/**
 	 * Usually called from futureTick after
