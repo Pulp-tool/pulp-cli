@@ -11,6 +11,18 @@ class Pulp {
 		$this->loop = \React\EventLoop\Factory::create();
 	}
 
+	public function colorize($msg) {
+		return $msg;
+	}
+
+	public function output($msg, $params = array()) {
+		$msg = sprintf($this->colorize($msg), $params);
+		printf ("[%s] %s\n", date('H:i:s'), $msg);
+	}
+
+	public function log($level, $msg, $params = array()) {
+	}
+
 	public function task($name, $deps, $callback=NULL) {
 		if (is_callable($deps) && $callback == NULL) {
 //			echo "Setting up callback as second param for task: $name...\n";
@@ -67,31 +79,29 @@ class Pulp {
 				$_cb();
 			}
 		}
-		$cb = $task['callback'];
-		if (is_callable( [$cb, 'call'])) {
-			$cb->call($this);
-		} else {
-			$cb();
+
+		try {
+			$this->output('Starting task \''.$name.'\'');
+			$start = time(1);
+			$cb = $task['callback'];
+			if (is_callable( [$cb, 'call'])) {
+				$cb->call($this);
+			} else {
+				$cb();
+			}
+			$this->output('Finished task \''.$name.'\' (took: '.((time(1)-$start)).' ms)');
+		} catch (\Exception $e) {
+			$this->output('Error: '.$e->getMessage());
 		}
 
 
-		$loop = $this->loop;
-		$wl   = $this->watchList;
-		/*
-		$this->loop->addPeriodicTimer(1.0, function () use ($wl, $loop) {
-			foreach ($wl as $_w) {
-				stream_set_blocking($_w->inotifyFd, FALSE);
-//				$ievent = \inotify_read($_w->inotifyFd);
-//				if ($ievent !== FALSE) {
-//					var_dump($ievent);
-//				}
+		$running = TRUE;
+		while($running) {
+			try {
+				$this->loop->run();
+			} catch (\Exception $e) {
+				$this->output('Error: '.$e->getMessage());
 			}
-		//	    $loop->cancelTimer($timer);
-		//		    echo 'Done' . PHP_EOL;
-		});
-		 */
-		$this->loop->run();
-
-
+		}
 	}
 }
