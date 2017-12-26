@@ -55,9 +55,16 @@ Setup your project
 Run pulp init-project to create a .pulp directory, a config.php file and a composer.json file.
 
 ```bash
-.pulp/
-   config.php # <== tasks go here
-   composer.json # <== pulp plugins go here
+your-project/
+  .pulp/            # <== created with pulp init-project
+     config.php     # <== tasks go here
+     composer.json  # <== pulp plugins go here
+  src/
+    controllers/
+  public/
+    templates/
+      styles/
+        my-project.less
 ```
 
 CD into the .pulp directory and run *composer install*
