@@ -35,12 +35,18 @@ class SourceList extends DataPipe {
 	public function resume() {
 		foreach ($this->sourceList as $_src) {
 
+			$stream = new \Pulp\Fs\GlobStream($_src);
+			$stream->on('data', function($data) {
+				$this->emit('data', [new \SplFileInfo($data)]);
+			});
+			$stream->findMatchingFiles();
+			/*
 			if (strpos($_src, '*') !== FALSE) {
-				$src = $this->findGlobParent($_src);
-			} else {
-				$src = $_src;
+//				$src = $this->findGlobParent($_src);
 			}
+			 */
 
+			/*
 			$src = realpath($this->workdir.'/'.$src).'/';
 			if (is_dir($src)) {
 				$d = \dir($src);
@@ -51,6 +57,7 @@ class SourceList extends DataPipe {
 			} else {
 					$this->emit('data', [new \SplFileInfo(rtrim($src,'/'))]);
 			}
+			 */
 		}
 
 		$this->end();
