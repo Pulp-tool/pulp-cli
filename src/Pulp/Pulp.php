@@ -95,13 +95,10 @@ class Pulp {
 		}
 
 
-		$running = TRUE;
-		while($running) {
-			try {
-				$this->loop->run();
-			} catch (\Exception $e) {
-				$this->output('Error: '.$e->getMessage());
-			}
+		try {
+			$this->loop->run();
+		} catch (\Exception $e) {
+			$this->output('Error: '.$e->getMessage());
 		}
 	}
 }
