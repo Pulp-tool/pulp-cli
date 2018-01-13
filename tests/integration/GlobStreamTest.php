@@ -51,4 +51,16 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 		$this->assertSame($fileList, $fileListExpected);
 	}
 
+	public function test_glob_finds_question_mark() {
+		$fileList         = [];
+		$fileListExpected = [
+			$this->rootDir.'foo.txt',
+		];
+		$gs = new \Pulp\Fs\GlobStream($this->rootDir.'fo?.txt');
+		$gs->on('data', function($data) use (&$fileList) {
+			$fileList[] = $data;
+		});
+		$gs->findMatchingFiles();
+		$this->assertSame($fileList, $fileListExpected);
+	}
 }

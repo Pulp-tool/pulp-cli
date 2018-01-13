@@ -60,6 +60,10 @@ class GlobStream extends \Pulp\DataPipe {
 			if (strpos($_part, '*') !== FALSE) {
 				return strlen($ret) ? $ret : '.';
 			}
+			if (strpos($_part, '?') !== FALSE) {
+				return strlen($ret) ? $ret : '.';
+			}
+
 			$ret .= $_part.'/';
 		}
 		return $ret;
@@ -80,12 +84,16 @@ class GlobStream extends \Pulp\DataPipe {
 			}
 			//matches anything in this root dir
 			//with just *.txt turned into [\w]*\.txt
-			if (strpos($_p, '*') !== FALSE) {
+			//treat ? as exactly one single character like [\w]
+			if (strpos($_p, '*') !== FALSE ||
+			    strpos($_p, '?') !== FALSE) {
 				$_p     = str_replace('.', '\.', $_p);
 				$_p     = str_replace('*', '', $_p);
+				$_p     = str_replace('?', '[\w]', $_p);
 				$regex .= '([\w\-\_]*'.$_p.')';
 				continue;
 			}
+
 			$regex .= '('.$_p.')/';
 		}
 		$regex .= '~';
