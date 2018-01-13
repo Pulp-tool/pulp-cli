@@ -71,14 +71,19 @@ class GlobStream extends \Pulp\DataPipe {
 		$regex     = '~';
 
 		foreach ($globParts as $_p) {
+			//matches anything in the current directory
+			//OR any directory below it
 			if (strpos($_p, '**') !== FALSE) {
 				//$regex .= '([./]*)';
 				$regex .= '([\w\-\_]+)|';
 				continue;
 			}
+			//matches anything in this root dir
+			//with just *.txt turned into [\w]*\.txt
 			if (strpos($_p, '*') !== FALSE) {
 				$_p     = str_replace('.', '\.', $_p);
-				$regex .= '((.+)'.$_p.')';
+				$_p     = str_replace('*', '', $_p);
+				$regex .= '([\w\-\_]*'.$_p.')';
 				continue;
 			}
 			$regex .= '('.$_p.')/';

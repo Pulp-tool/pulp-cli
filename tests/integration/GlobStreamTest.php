@@ -8,7 +8,7 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 	}
 
 
-	public function off_glob_finds_multiple_star() {
+	public function test_glob_finds_multiple_star() {
 		$fileList         = [];
 		$fileListExpected = [
 			$this->rootDir.'foo.txt',
@@ -22,10 +22,10 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 		$this->assertSame($fileList, $fileListExpected);
 	}
 
-	public function off_glob_finds_subdir() {
+	public function test_glob_finds_subdir() {
 		$fileList         = [];
 		$fileListExpected = [
-			$this->rootDir.'baz.txt'
+			$this->rootDir.'subd1/baz.txt'
 		];
 		$gs = new \Pulp\Fs\GlobStream($this->rootDir.'subd1/*.txt');
 		$gs->on('data', function($data) use (&$fileList) {
