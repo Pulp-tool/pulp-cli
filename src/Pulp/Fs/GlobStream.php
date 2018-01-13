@@ -15,8 +15,9 @@ class GlobStream extends \Pulp\DataPipe {
 	public $closed = FALSE;
 
 	public function __construct($glob, $opts=[]) {
-		$this->root        = $this->findGlobParent($glob);
-		$this->globPattern = $glob;
+		$this->root         = $this->findGlobParent($glob);
+		$this->globPattern  = $glob;
+		$this->regexPattern = $this->compileRegex($this->globPattern);
 	}
 
 	public function findMatchingFiles() {
@@ -30,7 +31,7 @@ class GlobStream extends \Pulp\DataPipe {
 			if ($entry == '..') { continue; }
 			if ($entry == '.' ) { $filename = $file->getPath(); }
 
-			if ( $this->fileMatchesGlob($filename, $this->globPattern)) {
+			if ( $this->fileMatchesGlob($filename)) {
 				$this->emit('data', [$filename]);
 			} else {
 
@@ -40,7 +41,7 @@ class GlobStream extends \Pulp\DataPipe {
 
 
 	public function write($data) {
-		if ( $this->fileMatchesGlob($data, $this->globPattern)) {
+		if ( $this->fileMatchesGlob($data)) {
 			$this->emit('write', $data);
 		}
 	}
@@ -69,8 +70,18 @@ class GlobStream extends \Pulp\DataPipe {
 		return $ret;
 	}
 
-	public function fileMatchesGlob($name, $glob) {
+	public function fileMatchesGlob($name, $glob=NULL) {
+		if ($glob != NULL) {
+			$regex = $this->compileRegex($glob);
+		} else {
+			$regex = $this->regexPattern;
+		}
 		$matches   = [];
+		$x = preg_match($regex, $name, $matches);
+		return $x;
+	}
+
+	public function compileRegex($glob) {
 		$globParts = explode('/', $glob);
 		$regex     = '~';
 
@@ -97,15 +108,6 @@ class GlobStream extends \Pulp\DataPipe {
 			$regex .= '('.$_p.')/';
 		}
 		$regex .= '~';
-
-		$x = preg_match($regex, $name, $matches);
-		/*
-		echo "Glob:  $glob \n";
-		echo "Regex: $regex \n";
-		echo "Name:  $name \n";
-		var_dump($x);
-		var_dump($matches);
-		*/
-		return $x;
+		return $regex;
 	}
 }
