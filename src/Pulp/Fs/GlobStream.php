@@ -15,7 +15,11 @@ class GlobStream extends \Pulp\DataPipe {
 	public $closed = FALSE;
 
 	public function __construct($glob, $opts=[]) {
-		$this->root         = $this->findGlobParent($glob);
+		if ($this->isGlob($glob)) {
+			$this->root         = $this->findGlobParent($glob);
+		} else {
+			$this->root         = $this->findStaticParent($glob);
+		}
 		$this->globPattern  = $glob;
 		$this->regexPattern = $this->compileRegex($this->globPattern);
 	}
@@ -39,11 +43,20 @@ class GlobStream extends \Pulp\DataPipe {
 		}
 	}
 
-
 	public function write($data) {
 		if ( $this->fileMatchesGlob($data)) {
 			$this->emit('write', $data);
 		}
+	}
+
+	public function isGlob($glob) {
+		if (strpos($glob, '*')) {
+			return TRUE;
+		}
+		if (strpos($glob, '?')) {
+			return TRUE;
+		}
+		return FALSE;
 	}
 
 	/**
@@ -70,6 +83,17 @@ class GlobStream extends \Pulp\DataPipe {
 		return $ret;
 	}
 
+	public function findStaticParent($glob) {
+		if (substr($glob, -1) == '/') {
+			return $glob;
+		}
+
+		$fileParts = explode('/', rtrim($glob, '/'));
+		array_pop($fileParts);
+		return implode('/', $fileParts);
+	}
+
+
 	public function fileMatchesGlob($name, $glob=NULL) {
 		if ($glob != NULL) {
 			$regex = $this->compileRegex($glob);
@@ -86,6 +110,9 @@ class GlobStream extends \Pulp\DataPipe {
 		$regex     = '~';
 
 		foreach ($globParts as $_p) {
+			if (strlen($regex) > 1) {
+				$regex .= '/';
+			}
 			//matches anything in the current directory
 			//OR any directory below it
 			if (strpos($_p, '**') !== FALSE) {
@@ -105,7 +132,7 @@ class GlobStream extends \Pulp\DataPipe {
 				continue;
 			}
 
-			$regex .= '('.$_p.')/';
+			$regex .= '('.$_p.')';
 		}
 		$regex .= '~';
 		return $regex;

@@ -63,4 +63,30 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 		$gs->findMatchingFiles();
 		$this->assertSame($fileList, $fileListExpected);
 	}
+
+	public function test_no_glob_produces_regex() {
+		$filename = $this->rootDir.'subd1/baz.txt';
+
+		$gs = new \Pulp\Fs\GlobStream($this->rootDir.'subd1/baz.txt');
+		$x = $gs->compileRegex($filename);
+		$this->assertEquals('~(tests)/(testroot)/(subd1)/(baz.txt)~', $x);
+
+	}
+	public function test_no_glob_matches_one_file() {
+		$fileList         = [];
+		$fileListExpected = [
+			$this->rootDir.'subd1/baz.txt',
+		];
+		$gs = new \Pulp\Fs\GlobStream($this->rootDir.'subd1/baz.txt');
+
+		$filename = $this->rootDir.'subd1/baz.txt';
+		$x = $gs->fileMatchesGlob($filename);
+		$this->assertEquals(1, $x);
+
+		$gs->on('data', function($data) use (&$fileList) {
+			$fileList[] = $data;
+		});
+		$gs->findMatchingFiles();
+		$this->assertSame($fileList, $fileListExpected);
+	}
 }
