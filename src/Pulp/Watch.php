@@ -61,7 +61,6 @@ class Watch extends EventEmitter {
 		foreach ($fileList as $_filePattern) {
 			$globParent = $this->findGlobParent($_filePattern);
 			$realParent =  realpath($globParent).'/';
-			var_dump($realParent);
 			$wd = \inotify_add_watch($this->inotifyFd, $realParent, IN_MODIFY|IN_CLOSE_WRITE);
 			$this->wdToRealPath[$wd] = $realParent;
 			$this->wdToGlob[$wd]     = $_filePattern;

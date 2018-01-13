@@ -45,8 +45,9 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 
     public function pipe(WritableStreamInterface $dest, array $options = array())
     {
-		$options['end'] = FALSE;
+//		$options['end'] = FALSE;
 
+		/*
 		//default pipe behavior throws away $data for end events
 		$this->on('end', $ender = function () use($dest) {
 			call_user_func_array([$dest, 'end'], func_get_args());
@@ -56,6 +57,7 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 		$dest->on('close', function () use ($source, $ender) {
 			$source->removeListener('end', $ender);
 		});
+		 */
 
         return Util::pipe($this, $dest, $options);
     }

@@ -72,6 +72,7 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals('~(tests)/(testroot)/(subd1)/(baz.txt)~', $x);
 
 	}
+
 	public function test_no_glob_matches_one_file() {
 		$fileList         = [];
 		$fileListExpected = [
