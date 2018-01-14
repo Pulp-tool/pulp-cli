@@ -27,10 +27,17 @@ class DestList extends DataPipe {
 		}
 	}
 
-	public function write($data) {
+	/**
+	 * Take a virtual file, write its contents to all dest folders.
+	 * update the virtual files pathname to the dest folder.
+	 * signal a data event downstream.
+	 */
+	public function write($file) {
 		foreach ($this->destList as $_dest) {
-			file_put_contents($this->workdir.'/'.$_dest, $data);
-			$this->emit('end', [new \SplFileInfo($this->workdir.'/'.$_dest)]);
+			$outputPath = $this->workdir.'/'.$_dest.$file->getBasename();
+			file_put_contents($outputPath, $file->getContents());
+			$file->setPathname($outputPath);
+			$this->emit('data', [$file]);
 		}
 	}
 }

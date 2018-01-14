@@ -37,7 +37,7 @@ class SourceList extends DataPipe {
 
 			$stream = new \Pulp\Fs\GlobStream($_src);
 			$stream->on('data', function($data) {
-				$this->emit('data', [new \SplFileInfo($data)]);
+				$this->emit('data', [new Fs\VirtualFile($data)]);
 			});
 			$stream->findMatchingFiles();
 			/*
