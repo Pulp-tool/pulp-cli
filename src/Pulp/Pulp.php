@@ -52,6 +52,9 @@ class Pulp {
 
 	public function src($fileList, $opts=NULL) {
 		$s =  new SourceList($fileList, $this->loop);
+		$s->on('log', function($data) {
+			$this->output($data);
+		});
 		$this->loop->futureTick(function() use($s) {
 			$s->resume();
 		});

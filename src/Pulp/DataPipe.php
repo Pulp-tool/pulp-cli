@@ -45,19 +45,11 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 
     public function pipe(WritableStreamInterface $dest, array $options = array())
     {
-//		$options['end'] = FALSE;
-
-		/*
-		//default pipe behavior throws away $data for end events
-		$this->on('end', $ender = function () use($dest) {
-			call_user_func_array([$dest, 'end'], func_get_args());
+		//bubble up log events until we get to something
+		//that is connected to main Pulp object and can output
+		$dest->on('log', function($data) {
+			$this->emit('log', [$data]);
 		});
-
-		$source = $this;
-		$dest->on('close', function () use ($source, $ender) {
-			$source->removeListener('end', $ender);
-		});
-		 */
 
         return Util::pipe($this, $dest, $options);
     }
