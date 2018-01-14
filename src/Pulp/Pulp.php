@@ -6,18 +6,32 @@ class Pulp {
 
 	public $loop;
 	public $watchList;
+	public $color = TRUE;
 
 	public function __construct() {
 		$this->loop = \React\EventLoop\Factory::create();
 	}
 
 	public function colorize($msg) {
+		if (!$this->color) {
+			$msg = str_replace('<meta>', '', $msg);
+			$msg = str_replace('</>', '', $msg);
+			return $msg;
+		}
+
+		$msg = str_replace('<meta>', "\033".'[90m', $msg);
+		$msg = str_replace('</>', "\033".'[0m', $msg);
+
+		$msg = str_replace('<file>', "\033".'[35m', $msg);
+
+		$msg = str_replace('<name>', "\033".'[96m', $msg);
 		return $msg;
 	}
 
 	public function output($msg, $params = array()) {
-		$msg = sprintf($this->colorize($msg), $params);
-		printf ("[%s] %s\n", date('H:i:s'), $msg);
+		$msg = sprintf($msg, $params);
+		$msg = sprintf ("[<meta>%s</>] %s\n", date('H:i:s'), $msg);
+		echo $this->colorize($msg);
 	}
 
 	public function log($level, $msg, $params = array()) {
@@ -84,7 +98,7 @@ class Pulp {
 		}
 
 		try {
-			$this->output('Starting task \''.$name.'\'');
+			$this->output('Starting task \'<name>'.$name.'</>\'');
 			$start = time(1);
 			$cb = $task['callback'];
 			if (is_callable( [$cb, 'call'])) {
@@ -92,7 +106,7 @@ class Pulp {
 			} else {
 				$cb();
 			}
-			$this->output('Finished task \''.$name.'\' (took: '.((time(1)-$start)).' ms)');
+			$this->output('Finished task \'<name>'.$name.'</>\' (took: '.((time(1)-$start)).' ms)');
 		} catch (\Exception $e) {
 			$this->output('Error: '.$e->getMessage());
 		}
