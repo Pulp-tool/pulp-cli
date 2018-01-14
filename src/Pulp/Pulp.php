@@ -1,6 +1,7 @@
 <?php
 
 namespace Pulp;
+use \React\Stream\ReadableStreamInterface;
 
 class Pulp {
 
@@ -29,7 +30,7 @@ class Pulp {
 	}
 
 	public function output($msg, $params = array()) {
-		$msg = sprintf($msg, $params);
+		$msg = vsprintf($msg, $params);
 		$msg = sprintf ("[<meta>%s</>] %s\n", date('H:i:s'), $msg);
 		echo $this->colorize($msg);
 	}
@@ -66,8 +67,8 @@ class Pulp {
 
 	public function src($fileList, $opts=NULL) {
 		$s =  new SourceList($fileList, $this->loop);
-		$s->on('log', function($data) {
-			$this->output($data);
+		$s->on('log', function($data,$params) {
+			$this->output($data, $params);
 		});
 		$this->loop->futureTick(function() use($s) {
 			$s->resume();
@@ -90,23 +91,40 @@ class Pulp {
 			}
 			$dep = $this->taskList[$_dep];
 			$_cb = $dep['callback'];
+
+			$this->output('Starting task \'<name>'.$_dep.'</>\'');
+			$start = microtime(1);
 			if (is_callable( [$_cb, 'call'])) {
-				$_cb->call($this);
+				$pipe = $_cb->call($this);
 			} else {
-				$_cb();
+				$pipe = $_cb($this);
+			}
+			if($pipe instanceof ReadableStreamInterface) {
+				$pipe->on('end', function() use($start, $_dep) {
+					$this->output('Finished task \'<name>'.$_dep.'</>\' (took: %0.3f ms)', [((microtime(1)-$start)*1000)]);
+				});
+			} else {
+				$this->output('Finished task \'<name>'.$_dep.'</>\' (took: %0.3f ms)', [((microtime(1)-$start)*1000)]);
 			}
 		}
 
+
 		try {
 			$this->output('Starting task \'<name>'.$name.'</>\'');
-			$start = time(1);
+			$start = microtime(1);
 			$cb = $task['callback'];
 			if (is_callable( [$cb, 'call'])) {
-				$cb->call($this);
+				$pipe = $cb->call($this);
 			} else {
-				$cb();
+				$pipe = $cb($this);
 			}
-			$this->output('Finished task \'<name>'.$name.'</>\' (took: '.((time(1)-$start)).' ms)');
+			if($pipe instanceof ReadableStreamInterface) {
+				$pipe->on('end', function() use($start, $name) {
+					$this->output('Finished task \'<name>'.$name.'</>\' (took: %0.3f ms)', [((microtime(1)-$start)*1000)]);
+				});
+			} else {
+				$this->output('Finished task \'<name>'.$name.'</>\' (took: %0.3f ms)', [((microtime(1)-$start)*1000)]);
+			}
 		} catch (\Exception $e) {
 			$this->output('Error: '.$e->getMessage());
 		}
