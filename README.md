@@ -13,6 +13,8 @@ From your project root:
 
 ```bash
 pulp init-project
+git add .pulp/
+git commit -m "Adding pulp build tool"
 cd .pulp
 composer install
 ```
