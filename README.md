@@ -7,6 +7,16 @@ chmod a+x pulp.phar
 mv pulp.phar /usr/local/bin/pulp
 ```
 
+Initialize your project
+===
+From your project root:
+
+```bash
+pulp init-project
+cd .pulp
+composer install
+```
+
 Use
 ===
 Create tasks and watchers, pipe data from src() to dest()
