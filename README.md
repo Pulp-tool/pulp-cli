@@ -50,6 +50,77 @@ pulp build
 pulp watch
 ```
 
+Compile Less
+===
+```php
+
+$p = new \Pulp\Pulp();
+
+function compileLess($p) {
+	return $p->src(['foo/bootstrap.less'])
+	  ->pipe(new \Pulp\Debug())                     //will simply print every file from src
+	  ->pipe(new \Pulp\Less( ['compress'=>TRUE] ))  //renames files from *.less to *.css
+	  ->pipe($p->dest('foo/'));                     //will output foo/bootstrap.css
+
+}
+$p->task('less-now', function() use($p) {
+	compileLess($p)
+});
+
+$p->task('less', function() use($p) {
+	compileLess($p);  //start by refreshing once
+	$p->watch( ['foo/**/*.less'])->on('change', function($file) use ($p, $lr) {
+		compileLess($p);
+	});
+});
+
+```
+
+```bash
+[11:26:25] Starting task 'less'
+[11:26:25] Finished task 'less' (took: 9.230 ms)
+[11:26:25] pulp-debug: bootstrap.less
+[11:26:29] pulp-debug: bootstrap.less
+```
+
+
+Compile Less with LiveReload
+===
+```php
+
+$p = new \Pulp\Pulp();
+$lr = new \Pulp\LiveReload();
+
+function compileLess($p) {
+	return $p->src(['foo/bootstrap.less'])
+	  ->pipe(new \Pulp\Debug())                     //will simply print every file from src
+	  ->pipe(new \Pulp\Less( ['compress'=>TRUE] ))  //renames files from *.less to *.css
+	  ->pipe($p->dest('foo/'));                     //will output foo/bootstrap.css
+
+}
+
+$p->task('less', function() use($p) {
+	$lr = new lr();
+	$lr->listen($p->loop);
+
+	compileLess($p);  //start by refreshing once
+	$p->watch( ['foo/**/*.less'])->on('change', function($file) use ($p, $lr) {
+		$stream = compileLess($p);
+		return $stream->pipe($lr);
+	});
+});
+
+```
+
+```bash
+[11:27:11] Starting task 'less'
+[11:27:11] Finished task 'less' (took: 9.230 ms)
+[11:27:11] pulp-debug: bootstrap.less
+[11:27:15] pulp-debug: bootstrap.less
+[11:27:15] Sending reload because file changed: bootstrap.css
+```
+
+
 Setup your project
 ===
 Run pulp init-project to create a .pulp directory, a config.php file and a composer.json file.
