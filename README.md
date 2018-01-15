@@ -2,9 +2,9 @@ Install
 ===
 Download the phar file, make it executable and move it to /usr/local/bin/pulp
 ```bash
-wget https://github.com/Pulp-tool/pulp-cli/releases/download/0.5.2/pulp.phar
+wget https://github.com/Pulp-tool/pulp-cli/releases/download/0.6.0/pulp.phar
 chmod a+x pulp.phar
-mv pulp.phar /usr/local/bin
+mv pulp.phar /usr/local/bin/pulp
 ```
 
 Use
