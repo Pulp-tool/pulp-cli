@@ -7,6 +7,7 @@ class Pulp {
 
 	public $loop;
 	public $watchList;
+	public $sourceList = [];
 	public $color = TRUE;
 
 	public function __construct() {
@@ -59,20 +60,16 @@ class Pulp {
 
 	public function dest($fileList, $opts=NULL) {
 		$d =  new DestList($fileList, $this->loop);
-		$this->loop->futureTick(function() use($d) {
-			$d->resume();
-		});
 		return $d;
 	}
 
 	public function src($fileList, $opts=NULL) {
-		$s =  new SourceList($fileList, $this->loop);
+		$s =  new SourceList($fileList);
 		$s->on('log', function($data,$params) {
 			$this->output($data, $params);
 		});
-		$this->loop->futureTick(function() use($s) {
-			$s->resume();
-		});
+
+		$this->sourceList[] = $s;
 		return $s;
 	}
 
@@ -130,10 +127,25 @@ class Pulp {
 		}
 
 
+		$this->loop->futureTick(function() {
+			$this->flushReadable();
+		});
+
+
 		try {
 			$this->loop->run();
 		} catch (\Exception $e) {
 			$this->output('Error: '.$e->getMessage());
+		}
+	}
+
+	public function flushReadable() {
+		foreach ($this->sourceList as $_s) {
+			if (!$_s->closed) {
+				$this->loop->futureTick(function() use($_s) {
+					$_s->resume();
+				});
+			}
 		}
 	}
 }
