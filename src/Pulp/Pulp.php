@@ -145,13 +145,17 @@ class Pulp {
 	}
 
 	public function flushReadable() {
+		$hasMore = FALSE;
 		foreach ($this->sourceList as $_s) {
 			if (!$_s->closed) {
+				$hasMore = TRUE;
 				$this->loop->futureTick(function() use($_s) {
 					$_s->resume();
 				});
 			}
 		}
-		$this->loop->futureTick([$this, 'flushReadable']);
+		if ($hasMore) {
+			$this->loop->futureTick([$this, 'flushReadable']);
+		}
 	}
 }
