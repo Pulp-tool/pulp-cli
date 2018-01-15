@@ -40,38 +40,8 @@ class SourceList extends DataPipe {
 				$this->emit('data', [new Fs\VirtualFile($data)]);
 			});
 			$stream->findMatchingFiles();
-			/*
-			if (strpos($_src, '*') !== FALSE) {
-//				$src = $this->findGlobParent($_src);
-			}
-			 */
-
-			/*
-			$src = realpath($this->workdir.'/'.$src).'/';
-			if (is_dir($src)) {
-				$d = \dir($src);
-				while(FALSE !== ($entry = $d->read())) {
-					if (is_dir($src.$entry)) { continue; }
-					$this->emit('data', [new \SplFileInfo($src.$entry)]);
-				}
-			} else {
-					$this->emit('data', [new \SplFileInfo(rtrim($src,'/'))]);
-			}
-			 */
 		}
 
 		$this->end();
-	}
-
-	public function findGlobParent($glob) {
-		$ret = '';
-		$fileParts = explode('/', rtrim($glob, '/'));
-		foreach ($fileParts as $_part) {
-			if (strpos($_part, '*') !== FALSE) {
-				return strlen($ret) ? $ret : '.';
-			}
-			$ret .= $_part.'/';
-		}
-		return $ret;
 	}
 }
