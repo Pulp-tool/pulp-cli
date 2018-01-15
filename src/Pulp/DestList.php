@@ -32,7 +32,7 @@ class DestList extends DataPipe {
 	 * update the virtual files pathname to the dest folder.
 	 * signal a data event downstream.
 	 */
-	public function write($file) {
+	public function _onWrite($file) {
 		foreach ($this->destList as $_dest) {
 			$outputPath = $this->workdir.'/'.$_dest.$file->getBasename();
 			file_put_contents($outputPath, $file->getContents());
