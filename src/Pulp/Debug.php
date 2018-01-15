@@ -13,7 +13,7 @@ class Debug extends DataPipe {
 	}
 
 	public function write($data) {
-		$this->emit('log', ['Got: <file>'.$data->getFilename().'</>']);
+		$this->emit('log', ['pulp-debug: <file>'.$data->getFilename().'</>']);
 		$this->emit('data', [$data]);
 	}
 }
