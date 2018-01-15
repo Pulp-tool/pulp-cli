@@ -28,4 +28,8 @@ class VirtualFile { // extends \SplFileInfo {
 	public function __call($name, $args) {
 		return call_user_func_array([$this->spl, $name], $args);
 	}
+
+	public function __toString() {
+		return $this->getFilename();
+	}
 }
