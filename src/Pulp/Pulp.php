@@ -36,7 +36,12 @@ class Pulp {
 		echo $this->colorize($msg);
 	}
 
-	public function log($level, $msg, $params = array()) {
+	public function log($msg, $params = array()) {
+		$this->_log('INFO', $msg, $params);
+	}
+
+	public function _log($level, $msg, $params = array()) {
+		$this->output($msg, $params);
 	}
 
 	public function task($name, $deps, $callback=NULL) {
