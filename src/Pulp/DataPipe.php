@@ -12,6 +12,7 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 	public $writeCallback;
 	public $endCallback;
 	public $closed = FALSE;
+	protected $chunkList = [];
 
 	public function __construct($writeCallable=NULL, $endCallable=NULL) {
 		$this->writeCallback = $writeCallable;
@@ -25,9 +26,17 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 	public function pause() {
 	}
 
+	public function push($data) {
+		$this->chunkList[] = $data;
+	}
+
 	public function end($data=null) {
+		$this->flush();
+
 		$cb = $this->endCallback;
-		if ($cb) {
+		if (is_array($cb)) {
+			call_user_func($cb, $this);
+		} else if ($cb) {
 			$cb($this);
 		}
 
@@ -39,7 +48,15 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 		$this->closed = TRUE;
 	}
 
+	public function flush() {
+		while ($chunk = array_pop($this->chunkList)) {
+			$this->emit('data', [$chunk]);
+		}
+	}
+
+
 	public function resume() {
+		$this->flush();
 	}
 
 	public function isReadable() {
@@ -49,11 +66,19 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 		return TRUE;
 	}
 
+	//meant for sub-classing
+	protected function _onWrite($data) {
+	}
+
 	public function write($data) {
 		$cb = $this->writeCallback;
-		if ($cb) {
+		if (is_array($cb)) {
+			call_user_func($cb, $data, $this);
+		} else if ($cb) {
 			$cb($data, $this);
 		}
+		$this->_onWrite($data);
+
 	}
 
     public function pipe(WritableStreamInterface $dest, array $options = array())
