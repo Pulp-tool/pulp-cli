@@ -35,9 +35,15 @@ $p->task('wait-and-pipe', function() use($p) {
 	$p->watch( ['src/**/*.php', 'foo/**/*.php'])->on('change', function($file) use ($p) {
 		//this will pipe *all* files in src/ and foo/, not just the ones that changed
 		$p->src(['src/', 'foo/'])
-			->pipe(new \Pulp\DataPipe(function($data) {
+			->pipe(new \Pulp\DataPipe(function($data, $pipe) {
 				echo "Data Pipe got "; var_dump($data);
+				$pipe->push($data); //propagate data down the chain
+			}))
+			->pipe(new \Pulp\DataPipe(null, function($data, $pipe) {
+				// the second parameter is for end even handlers
+				echo "I'm only called once \n";
 			})
+
 		);
 			
 		echo "This file triggered the change event: ".$file." ...\n";
