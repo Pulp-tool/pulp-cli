@@ -152,5 +152,6 @@ class Pulp {
 				});
 			}
 		}
+		$this->loop->futureTick([$this, 'flushReadable']);
 	}
 }
