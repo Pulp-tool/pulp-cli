@@ -2,8 +2,7 @@
 
 namespace Pulp\Task;
 
-class InitProject {
-
+class InitProject extends \Pulp\Task {
 
 	public function __invoke() {
 	exec ('mkdir .pulp');

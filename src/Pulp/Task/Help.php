@@ -1,11 +1,16 @@
 <?php
 namespace Pulp\Task;
 
-class Help {
+class Help extends \Pulp\Task {
 
-	public function __invoke() {
+	public function __invoke($pulp) {
+		$this->output("Help: run php pulp.phar <name>{task}</>");
+		$this->output("define tasks in <file>.pulp/config.php</>");
+		$this->output("");
+		$this->output("Available tasks:");
 
-		echo "Help: run php pulp.phar {task}\n";
-		echo "define tasks in .pulp/config.php\n";
+		foreach ( array_keys($pulp->taskList) as $name ) {
+			$this->output("<name>".$name."</>");
+		}
 	}
 }
