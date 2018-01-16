@@ -71,3 +71,9 @@ function resolve(...$args) {
 	}
 	return $path;
 }
+
+function mkdirp($outputPath) {
+	$finfo = new \SplFileInfo($outputPath);
+	$pinfo = $finfo->getPathInfo();
+	@mkdir($pinfo->getPathname(), 0755, TRUE);
+}
