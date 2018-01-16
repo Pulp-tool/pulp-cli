@@ -69,7 +69,7 @@ class Pulp {
 	}
 
 	public function src($fileList, $opts=NULL) {
-		$s =  new SourceList($fileList);
+		$s =  new SourceList($fileList, $opts);
 		$s->on('log', function($data,$params) {
 			$this->output($data, $params);
 		});
