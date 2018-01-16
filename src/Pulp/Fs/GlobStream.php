@@ -24,6 +24,10 @@ class GlobStream extends \Pulp\DataPipe {
 		$this->regexPattern = $this->compileRegex($this->globPattern);
 	}
 
+	public function getGlobParent() {
+		return $this->root;
+	}
+
 	public function findMatchingFiles() {
 		$it = new \RecursiveDirectoryIterator($this->root);
 		//this iterator doesn't give you directories as entries but
