@@ -8,6 +8,7 @@ class Pulp {
 	public $loop;
 	public $watchList;
 	public $sourceList = [];
+	public $flags      = [];
 	public $color = TRUE;
 
 	public function __construct() {
@@ -43,6 +44,22 @@ class Pulp {
 	public function _log($level, $msg, $params = array()) {
 		$this->output($msg, $params);
 	}
+
+	public function setFlags($f) {
+		$this->flags = $f;
+	}
+
+	public function getFlags() {
+		return $this->flags;
+	}
+
+	public function getFlag($key, $default=NULL) {
+		if (array_key_exists($key, $this->flags)) {
+			return $this->flags[$key];
+		}
+		return $default;
+	}
+
 
 	public function task($name, $deps, $callback=NULL) {
 		if (is_callable($deps) && $callback == NULL) {

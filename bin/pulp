@@ -12,18 +12,45 @@ $path = getcwd();
 
 $configPath = findConfigDir('.pulp', $path);
 
-$targetTask = parseFlags();
+$targetTask = parseTask();
 if ($targetTask == FALSE) {
 	$targetTask = 'help';
 }
 
-function parseFlags() {
+function parseTask() {
 	global $argv;
 	if (!isset($argv[1])){
 		return FALSE;
 	}
 	return $argv[1];
 }
+
+function parseFlags() {
+	global $argv, $argc;
+
+	$flags = [];
+
+	for($x=2; $x < $argc; $x++) {
+		$flag = $argv[$x];
+		if (strpos('=', $flag)) {
+			list ($key, $val) = explode('=', $flag);
+		} else {
+			if (strpos('-', $flag)) {
+				$key = $flag;
+				$key = ltrim($key, '-');
+				$key = ltrim($key, '-');
+				$val = TRUE;
+			} else {
+				$key = count($flags);
+				$val = $flag;
+			}
+		}
+		$flags[$key] = $val;
+	}
+
+	return $flags;
+}
+
 function findConfigDir($dirName, $startingPath) {
 
 	do {
@@ -64,6 +91,8 @@ try {
 }
 
 class NoConfigDirException extends Exception {}
+
+$p->setFlags(parseFlags());
 
 //define tasks
 $p->task('init-project', new \Pulp\Task\InitProject());
