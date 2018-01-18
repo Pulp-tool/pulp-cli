@@ -37,6 +37,8 @@ class VirtualFile { // extends \SplFileInfo {
 		} else {
 			$partial = $fullPath;
 		}
+		//partials should never begin with /
+		$partial = ltrim($partial, '/');
 		return $partial;//$this->getFilename();
 
 	}

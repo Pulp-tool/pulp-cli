@@ -24,4 +24,21 @@ class Pulp_Fs_VirtualFileTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($expected, $d->getPath());
 	}
 
+	public function test_get_partial_filename_never_starts_with_slash() {
+		$expected = 'site.css';
+		$f = new \Pulp\Fs\VirtualFile('/usr/bin/site.css');
+		$this->assertEquals($expected, $f->getPartialFilename());
+
+		$this->assertNotEquals('/'.$expected, $f->getPartialFilename());
+
+		$f = new \Pulp\Fs\VirtualFile('/site.css', ['base'=>'.']);
+		$this->assertEquals($expected, $f->getPartialFilename());
+
+		$this->assertNotEquals('/'.$expected, $f->getPartialFilename());
+
+		$f = new \Pulp\Fs\VirtualFile('/site.css', ['base'=>'/']);
+		$this->assertEquals($expected, $f->getPartialFilename());
+
+		$this->assertNotEquals('/'.$expected, $f->getPartialFilename());
+	}
 }
