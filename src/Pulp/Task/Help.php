@@ -5,8 +5,9 @@ class Help extends \Pulp\Task {
 
 	public function __invoke($pulp) {
 
-		$this->output("
+		$logo = <<<EOF
 
+ _  _  _  _                   _  _                      
 (_)(_)(_)(_)_                (_)(_)                     
 (_)        (_) _         _      (_)    _  _  _  _       
 (_) _  _  _(_)(_)       (_)     (_)   (_)(_)(_)(_)_     
@@ -15,8 +16,9 @@ class Help extends \Pulp\Task {
 (_)           (_)_  _  _(_)_  _ (_) _ (_) _  _  _(_)    
 (_)             (_)(_)(_) (_)(_)(_)(_)(_)(_)(_)(_)      
                                       (_)               
-".$pulp->getVersion()."
-");
+EOF;
+
+		$this->output($logo."\n".$pulp->getVersion()."\n");
 
 		$this->output("Help: run php pulp.phar <name>{task}</>");
 		$this->output("define tasks in <file>.pulp/config.php</>");
