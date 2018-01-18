@@ -24,10 +24,9 @@ class Pulp {
 
 		$msg = str_replace('<meta>', "\033".'[90m', $msg);
 		$msg = str_replace('</>', "\033".'[0m', $msg);
-
 		$msg = str_replace('<file>', "\033".'[35m', $msg);
-
 		$msg = str_replace('<name>', "\033".'[96m', $msg);
+		$msg = str_replace('<error>', "\033".'[41m', $msg);
 		return $msg;
 	}
 
@@ -39,6 +38,10 @@ class Pulp {
 
 	public function log($msg, $params = array()) {
 		$this->_log('INFO', $msg, $params);
+	}
+
+	public function error($msg, $params = array()) {
+		$this->_log('ERROR', '<error>ERROR:</> '.$msg, $params);
 	}
 
 	public function _log($level, $msg, $params = array()) {
