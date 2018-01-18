@@ -114,16 +114,15 @@ class GlobStream extends \Pulp\DataPipe {
 		$regex     = '~';
 
 		foreach ($globParts as $_p) {
-			if (strlen($regex) > 1) {
-				$regex .= '/';
-			}
 			//matches anything in the current directory
 			//OR any directory below it
 			if (strpos($_p, '**') !== FALSE) {
 				//$regex .= '([./]*)';
-				$regex .= '([\w\-\_]+)|';
+				//$regex .= '([\w\-\_]+)|';
+				$regex .= '(.)*';
 				continue;
 			}
+
 			//matches anything in this root dir
 			//with just *.txt turned into [\w]*\.txt
 			//treat ? as exactly one single character like [\w]
@@ -135,6 +134,11 @@ class GlobStream extends \Pulp\DataPipe {
 				$regex .= '([\w\-\_]*'.$_p.')';
 				continue;
 			}
+
+			if (strlen($regex) > 1) {
+				$regex .= '/';
+			}
+
 
 			$regex .= '('.$_p.')';
 		}
