@@ -15,6 +15,7 @@ class Help extends \Pulp\Task {
 (_)           (_)_  _  _(_)_  _ (_) _ (_) _  _  _(_)    
 (_)             (_)(_)(_) (_)(_)(_)(_)(_)(_)(_)(_)      
                                       (_)               
+".$pulp->getVersion()."
 ");
 
 		$this->output("Help: run php pulp.phar <name>{task}</>");

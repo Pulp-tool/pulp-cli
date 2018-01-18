@@ -11,8 +11,18 @@ class Pulp {
 	public $flags      = [];
 	public $color = TRUE;
 
+	protected $buildVersion = '';
+	protected $buildDate    = '';
+
 	public function __construct() {
 		$this->loop = \React\EventLoop\Factory::create();
+		global $pulpBuildVersion, $pulpBuildDate;
+		if ($pulpBuildVersion) {
+			$this->setVersion($pulpBuildVersion);
+		}
+		if ($pulpBuildDate) {
+			$this->setDate($pulpBuildDate);
+		}
 	}
 
 	public function colorize($msg) {
@@ -63,6 +73,21 @@ class Pulp {
 		return $default;
 	}
 
+	public function getDate()  {
+		return $this->buildDate;
+	}
+
+	public function getVersion()  {
+		return $this->buildVersion;
+	}
+
+	protected function setDate($d) {
+		$this->buildDate = $d;
+	}
+
+	protected function setVersion($v) {
+		$this->buildVersion = $v;
+	}
 
 	public function task($name, $deps, $callback=NULL) {
 		if (is_callable($deps) && $callback == NULL) {
