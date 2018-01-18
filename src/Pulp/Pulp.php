@@ -173,7 +173,7 @@ class Pulp {
 				$this->output('Finished task \'<name>'.$name.'</>\' (took: %0.3f ms)', [((microtime(1)-$start)*1000)]);
 			}
 		} catch (\Exception $e) {
-			$this->output('Error: '.$e->getMessage());
+			$this->error($e->getMessage());
 		}
 
 
@@ -185,7 +185,7 @@ class Pulp {
 		try {
 			$this->loop->run();
 		} catch (\Exception $e) {
-			$this->output('Error: '.$e->getMessage());
+			$this->error($e->getMessage());
 		}
 	}
 
