@@ -239,3 +239,18 @@ your-project/
 CD into the .pulp directory and run *composer install*
 
 Edit config.php and create your own build pipeline
+
+
+$p Pulp object
+===
+| method|
+| -------- |
+| `src( array [$srcGlob [, $srcGlob, ...]], callback fn($file) )`
+|  A string or array of strings that point to source files.  Globbing with ?, * and ** is supported.  eg: ["src/\*\*/\*.php", "vendor/\*\*/\*"].  The callback fn() will accept one $file parameter. |
+| `watch( array [$srcGlob [, $srcGlob, ...]] )`
+|   A string or array of strings that point to source files.  Globbing with ?, * and ** is supported.  eg: ["src/\*\*/\*.php", "vendor/\*\*/\*"].  This will return an object that will emit a "`change`" event whenever a matching file changes. |
+| `dest( [$destDir, [$destDir, ...]] )`
+|  A string or array of destination directories (not globs).  This is usually the end of a pipeline and does not have a callback function. |
+| `task( $name, optional [dependencies], callback fn($p) )`
+|  A simple string name to call from command line, optional list of dependent tasks to run before this task starts and a callback function that will receive the `$p` object. |
+
