@@ -254,3 +254,13 @@ $p Pulp object
 | `task( $name, optional [dependencies], callback fn($p) )`
 |  A simple string name to call from command line, optional list of dependent tasks to run before this task starts and a callback function that will receive the `$p` object. |
 
+
+DataPipe object
+===
+
+| method|
+| -------- |
+|`pipe( WritableStreamInterface $destinationPipe [, array $options] )`
+| The pipe method can accept a new DataPipe object or any object that implements WritableStreamInterface.
+|`__construct( callback fn($file, $pipe) [, callback fn($pipe) ])`
+|The first argument is a callback that is called on every "`data`" event from the source pipe.  The second argument is a callback that is called on the "`end`" event from the source pipe.  Only one callback is required.  Note that the end callback does not receive a $file parameter.
