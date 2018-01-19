@@ -60,8 +60,9 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 	}
 
 	public function isReadable() {
-		return TRUE;
+		return !$this->closed;
 	}
+
 	public function isWritable() {
 		return TRUE;
 	}
