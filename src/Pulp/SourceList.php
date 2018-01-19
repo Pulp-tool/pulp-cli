@@ -16,6 +16,7 @@ class SourceList extends DataPipe {
 	public $opts    = [];
 	public $loop    = NULL;
 	public $started = FALSE;
+	protected $generator;
 
 	public function __construct($loop, $sourceList, $opts=NULL) {
 		$this->loop = $loop;
@@ -51,25 +52,24 @@ class SourceList extends DataPipe {
 	 * glob stream and reschedule itself for next loop tick.
 	 */
 	public function tickSourceFile() {
-		static $generator = NULL;
-		if ($generator == NULL) {
-			$generator = $this->readOneFile();
-			$generator->rewind();
+		if ($this->generator == NULL) {
+			$this->generator = $this->readOneFile();
+			$this->generator->rewind();
 		}
-		if (!$generator->valid()) {
+		if (!$this->generator->valid()) {
 			$this->end();
-			$generator = NULL;
+			$this->generator = NULL;
 			return;
 		}
-		$file = $generator->current();
+		$file = $this->generator->current();
 		$this->emit('data', [$file]);
-		$generator->next();
+		$this->generator->next();
 
         if (!$this->closed) {
 			$this->loop->futureTick([$this, 'tickSourceFile']);
 		}
 		if ($this->closed) {
-			$generator = NULL;
+			$this->generator = NULL;
 		}
 	}
 
