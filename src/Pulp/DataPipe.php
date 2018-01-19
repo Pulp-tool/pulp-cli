@@ -11,7 +11,8 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 
 	public $writeCallback;
 	public $endCallback;
-	public $closed = FALSE;
+	public $closed       = FALSE;
+	public $delayedPush  = FALSE;
 	protected $chunkList = [];
 
 	public function __construct($writeCallable=NULL, $endCallable=NULL) {
@@ -27,7 +28,11 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 	}
 
 	public function push($data) {
-		$this->chunkList[] = $data;
+		if ($this->delayedPush) {
+			$this->chunkList[] = $data;
+		} else {
+			$this->emit('data', [$data]);
+		}
 	}
 
 	public function end($data=null) {
@@ -53,7 +58,6 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
 			$this->emit('data', [$chunk]);
 		}
 	}
-
 
 	public function resume() {
 		$this->flush();
