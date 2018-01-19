@@ -62,11 +62,16 @@ $sample = <<<EOL
         {
             "type": "vcs",
             "url": "git@github.com:Pulp-tool/pulp-less.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@github.com:Pulp-tool/pulp-sass.git"
         }
     ],
     "require": {
         "pulp-livereload": "*",
-        "pulp-less": "*"
+        "pulp-less": "*",
+        "pulp-sass": "*"
      }
 }
 EOL;
