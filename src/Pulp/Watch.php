@@ -20,7 +20,7 @@ class Watch extends EventEmitter {
 
 		$this->cwd = getcwd();
 		if (extension_loaded('inotify')) {
-			$this->setupInofity($fileList, $loop);
+			$this->setupInotify($fileList, $loop);
 		} else {
 			$this->setupPoller($fileList, $loop);
 		}
@@ -57,11 +57,17 @@ class Watch extends EventEmitter {
 
 		$this->inotifyFd = \inotify_init();
 		foreach ($fileList as $_filePattern) {
+			$gs = new Fs\GlobStream($_filePattern);
+
+			$wd = \inotify_add_watch($this->inotifyFd, $gs->root, IN_MODIFY|IN_CLOSE_WRITE);
+			$this->wdToGlob[$wd]     = $gs;
+
+			/*
 			$globParent = $this->findGlobParent($_filePattern);
 			$realParent =  realpath($globParent).'/';
-			$wd = \inotify_add_watch($this->inotifyFd, $realParent, IN_MODIFY|IN_CLOSE_WRITE);
 			$this->wdToRealPath[$wd] = $realParent;
 			$this->wdToGlob[$wd]     = $_filePattern;
+			 */
 		}
 
 		$wdToRealPath = $this->wdToRealPath;
@@ -76,64 +82,15 @@ class Watch extends EventEmitter {
 			//var_dump($ievent);
 			foreach ($ievent as $_in) {
 				//determine if filename matches pattern
-				$parentPath = $wdToRealPath[$_in['wd']];
-				$filename = $parentPath.$_in['name'];
-				if ($this->fileMatchesGlob($_in['name'], $wdToGlob[$_in['wd']])) {
+				$gs       = $wdToGlob[$_in['wd']];
+				$filename = $gs->root.$_in['name'];
+				$file = new Fs\VirtualFile($filename);
+				if ($gs->fileMatchesGlob($file->getPathname())) {
 					if ($_in['mask'] & IN_MODIFY) {
-						$this->emit('change', [new \SplFileInfo($filename)]);
+						$this->emit('change', [$file]);
 					}
 				}
 			}
 		});
-	}
-
-	/**
-	 * Find the static top part of a dir/file glob
-	 *
-	 * foo/bar/ => foo/bar/
-	 * foo/*.css => foo/
-	 * foo/** / *.css => foo/
-	 * *.css => .
-	 */
-	public function findGlobParent($glob) {
-		$ret = '';
-		$fileParts = explode('/', rtrim($glob, '/'));
-		foreach ($fileParts as $_part) {
-			if (strpos($_part, '*') !== FALSE) {
-				return strlen($ret) ? $ret : '.';
-			}
-			$ret .= $_part.'/';
-		}
-		return $ret;
-	}
-
-	public function fileMatchesGlob($name, $glob) {
-		$regex     = '|(foo/)([./]*)((.+)\.css)|';
-		$matches   = [];
-		$globParts = explode('/', $glob);
-		$regex     = '|';
-		foreach ($globParts as $_p) {
-			if (strpos($_p, '**') !== FALSE) {
-				$regex .= '([./]*)';
-				continue;
-			}
-			if (strpos($_p, '*') !== FALSE) {
-				$_p     = str_replace('.', '\.', $_p);
-				$regex .= '((.+)'.$_p.')';
-				continue;
-			}
-			$regex .= '('.$_p.')/';
-		}
-		$regex .= '|';
-
-		$x = preg_match($regex, $name, $matches);
-		/*
-		echo "Glob:  $glob \n";
-		echo "Regex: $regex \n";
-		echo "Name:  $name \n";
-		var_dump($x);
-		var_dump($matches);
-		*/
-		return $x;
 	}
 }
