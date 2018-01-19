@@ -72,7 +72,8 @@ $sample = <<<EOL
         "pulp-livereload": "*",
         "pulp-less": "*",
         "pulp-sass": "*"
-     }
+    },
+    "minimun-stability": "dev"
 }
 EOL;
 
