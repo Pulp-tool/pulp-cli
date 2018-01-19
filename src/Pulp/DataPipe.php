@@ -90,9 +90,11 @@ class DataPipe implements \React\Stream\DuplexStreamInterface {
     {
 		//bubble up log events until we get to something
 		//that is connected to main Pulp object and can output
-		$dest->on('log', function($data, $params=NULL) {
+		$bubbler = function($data, $params=NULL) {
 			$this->emit('log', [$data, $params]);
-		});
+		};
+		$dest->removeAllListeners('log');
+		$dest->on('log', $bubbler);
 
         return Util::pipe($this, $dest, $options);
     }
