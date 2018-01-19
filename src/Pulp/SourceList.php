@@ -15,6 +15,7 @@ class SourceList extends DataPipe {
 	public $workdir = '.';
 	public $opts    = [];
 	public $loop    = NULL;
+	public $started = FALSE;
 
 	public function __construct($loop, $sourceList, $opts=NULL) {
 		$this->loop = $loop;
@@ -37,9 +38,10 @@ class SourceList extends DataPipe {
 	/**
 	 */
 	public function resume() {
-        if (!$this->closed) {
+		if (!$this->closed && !$this->started) {
+			$this->started = TRUE;
 			$this->tickSourceFile();
-        }
+		}
 	}
 
 	/**

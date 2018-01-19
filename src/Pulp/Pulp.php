@@ -120,6 +120,9 @@ class Pulp {
 		});
 
 		$this->sourceList[] = $s;
+
+		//resume this new source next tick
+		$this->loop->futureTick([$this, 'flushSources']);
 		return $s;
 	}
 
@@ -176,12 +179,6 @@ class Pulp {
 			$this->error($e->getMessage());
 		}
 
-
-		$this->loop->futureTick(function() {
-			$this->flushReadable();
-		});
-
-
 		try {
 			$this->loop->run();
 		} catch (\Exception $e) {
@@ -189,24 +186,12 @@ class Pulp {
 		}
 	}
 
-	public function flushReadable() {
-		$hasMore = FALSE;
+	/**
+	 * Call resume on all defined sources.
+	 */
+	public function flushSources() {
 		foreach ($this->sourceList as $_s) {
-
 			$_s->resume();
-			/*
-			if (!$_s->closed) {
-				$hasMore = TRUE;
-				$this->loop->futureTick(function() use($_s) {
-					$_s->resume();
-				});
-			}
-			 */
 		}
-		/*
-		if ($hasMore) {
-			$this->loop->futureTick([$this, 'flushReadable']);
-		}
-		 */
 	}
 }
