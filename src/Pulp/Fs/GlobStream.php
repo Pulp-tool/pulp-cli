@@ -153,13 +153,11 @@ class GlobStream extends \Pulp\DataPipe {
 				continue;
 			}
 
-			if (strlen($regex) > 1) {
-				$regex .= '/';
-			}
 
-
-			$regex .= '('.$_p.')';
+			$regex .= '('.$_p.')/';
 		}
+		//remove trailing dir separator
+		$regex = rtrim($regex, '/');
 		$regex .= '~';
 		return $regex;
 	}

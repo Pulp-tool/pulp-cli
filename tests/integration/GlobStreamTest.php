@@ -40,7 +40,6 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 		$fileListExpected = [
 			$this->rootDir.'foo.txt',
 			$this->rootDir.'bar.txt',
-			$this->rootDir.'subd1',
 			$this->rootDir.'subd1/baz.txt'
 		];
 		$gs = new \Pulp\Fs\GlobStream($this->rootDir.'**/*.txt');
