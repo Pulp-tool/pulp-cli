@@ -28,29 +28,27 @@ class Watch extends EventEmitter {
 
 	public function setupPoller($fileList, $loop) {
 
-		foreach ($fileList as $_filePattern) {
-			$globParent = $this->findGlobParent($_filePattern);
-			$realParent = realpath($globParent);
-			if (!$realParent) {
-				throw new \Exception("No such directory found for glob pattern: $_filePattern");
-			}
-			$realParent .= '/';
-			$this->fsWatcherList[$_filePattern]   = new Fs\PollWatcher($realParent);
+		foreach ($fileList as $_glob) {
+			$s =  new SourceList($loop, $_glob, []);
+			$s->on('log', function($data,$params) {
+				$this->log($data, $params);
+			});
+			$s->pipe( new Fs\Changed())
+				->on('data', function($file) {
+					$this->emit('change', [$file]);
+			});
+			$this->fsWatcherList[ $_glob ] = $s;
 		}
 
 		$watcherList = $this->fsWatcherList;
 
-		$loop->addPeriodicTimer(1.03, function() use ($watcherList) {
+		$loop->addPeriodicTimer(1.03, function() use ($watcherList, $loop) {
 
-			foreach ($watcherList as $_glob=>$_w) {
-				$changedList = $_w->findChangedFiles();
-			}
-
-			foreach ($changedList as $filename) {
-				$filenameShort = ltrim(str_replace($this->cwd, '', $filename), '/');
-				if ($this->fileMatchesGlob($filenameShort, $_glob)) {
-					$this->emit('change', [new \SplFileInfo($filename)]);
-				}
+			foreach ($watcherList as $_glob => $_src) {
+				//TODO: remove existing watchers
+				$_src->closed  = FALSE;
+				$_src->started = FALSE;
+				$_src->resume();
 			}
 		});
 	}
