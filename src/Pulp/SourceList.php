@@ -14,8 +14,11 @@ class SourceList extends DataPipe {
 	public $sourceList;
 	public $workdir = '.';
 	public $opts    = [];
+	public $loop    = NULL;
 
-	public function __construct($sourceList, $opts=NULL) {
+	public function __construct($loop, $sourceList, $opts=NULL) {
+		$this->loop = $loop;
+
 		$this->sourceList = $sourceList;
 		if (!is_array($this->sourceList)) {
 			$this->sourceList = array($this->sourceList);
@@ -32,10 +35,46 @@ class SourceList extends DataPipe {
 
 
 	/**
-	 * Usually called from futureTick after
-	 * all pipes are setup
 	 */
 	public function resume() {
+        if (!$this->closed) {
+			$this->tickSourceFile();
+        }
+	}
+
+	/**
+	 * Tick one source file, schedule next tick
+	 *
+	 * This will emit "data" for each file in the
+	 * glob stream and reschedule itself for next loop tick.
+	 */
+	public function tickSourceFile() {
+		static $generator = NULL;
+		if ($generator == NULL) {
+			$generator = $this->readOneFile();
+			$generator->rewind();
+		}
+		if (!$generator->valid()) {
+			$this->end();
+			$generator = NULL;
+			return;
+		}
+		$file = $generator->current();
+		$this->emit('data', [$file]);
+		$generator->next();
+
+        if (!$this->closed) {
+			$this->loop->futureTick([$this, 'tickSourceFile']);
+		}
+		if ($this->closed) {
+			$generator = NULL;
+		}
+	}
+
+	/**
+	 * @generator
+	 */
+	public function readOneFile() {
 		foreach ($this->sourceList as $_src) {
 
 			$stream = new \Pulp\Fs\GlobStream($_src);
@@ -44,16 +83,12 @@ class SourceList extends DataPipe {
 			if (!array_key_exists('base', $opts)) {
 				$opts['base'] = $base;
 			}
-			$stream->on('data', function($data) use($opts) {
-				if (is_dir($data)) {
-					return;
+			foreach ($stream->findMatchingFilesAsync() as $fname) {
+				if (is_dir($fname)) {
+					continue;
 				}
-				$file = new Fs\VirtualFile($data, $opts);
-				$this->emit('data', [$file]);
-			});
-			$stream->findMatchingFiles();
+				yield new Fs\VirtualFile($fname, $opts);
+			}
 		}
-
-		$this->end();
 	}
 }

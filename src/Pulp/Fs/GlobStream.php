@@ -47,6 +47,24 @@ class GlobStream extends \Pulp\DataPipe {
 		}
 	}
 
+	public function findMatchingFilesAsync() {
+		$it = new \RecursiveDirectoryIterator($this->root);
+		//this iterator doesn't give you directories as entries but
+		//it gives the sub virtual file of '.' and '..' and you're supposed
+		//to figure out if it's a directory from there and try to deal with it
+		//in some unusual fashion
+		foreach(new \RecursiveIteratorIterator($it) as $filename => $file) {
+			$entry = $file->getFilename();
+			if ($entry == '..') { continue; }
+			if ($entry == '.' ) { $filename = $file->getPath(); }
+
+			if ( $this->fileMatchesGlob($filename)) {
+				yield $filename;
+			}
+		}
+	}
+
+
 	public function write($data) {
 		if ( $this->fileMatchesGlob($data)) {
 			$this->emit('write', $data);

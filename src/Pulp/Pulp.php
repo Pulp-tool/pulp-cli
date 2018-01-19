@@ -114,7 +114,7 @@ class Pulp {
 	}
 
 	public function src($fileList, $opts=NULL) {
-		$s =  new SourceList($fileList, $opts);
+		$s =  new SourceList($this->loop, $fileList, $opts);
 		$s->on('log', function($data,$params) {
 			$this->output($data, $params);
 		});
@@ -192,15 +192,21 @@ class Pulp {
 	public function flushReadable() {
 		$hasMore = FALSE;
 		foreach ($this->sourceList as $_s) {
+
+			$_s->resume();
+			/*
 			if (!$_s->closed) {
 				$hasMore = TRUE;
 				$this->loop->futureTick(function() use($_s) {
 					$_s->resume();
 				});
 			}
+			 */
 		}
+		/*
 		if ($hasMore) {
 			$this->loop->futureTick([$this, 'flushReadable']);
 		}
+		 */
 	}
 }
