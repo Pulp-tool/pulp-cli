@@ -19,12 +19,14 @@ class Debug extends DataPipe {
 	}
 
 	public function write($data) {
-		$this->emit('log', ['pulp-debug: <file>'.$data->getFilename().'</>']);
+		$lg = 'pulp-debug: <file>'.$data->getPathname().'</>';
 		if ($this->verbose) {
-			$this->emit('log', ['      base: <file>'.$data->base.'</>']);
-			$this->emit('log', ['  pathname: <file>'.$data->getPathname().'</>']);
-			$this->emit('log', ['   partial: <file>'.$data->getPartialPathname().'</>']);
+			$lg .= PHP_EOL;
+			$lg .= '        base: <file>'.$data->base.'</>'.PHP_EOL;
+			$lg .= '    pathname: <file>'.$data->getPathname().'</>'.PHP_EOL;
+			$lg .= '     partial: <file>'.$data->getPartialPathname().'</>';
 		}
+		$this->emit('log', [$lg]);
 		$this->emit('data', [$data]);
 	}
 }
