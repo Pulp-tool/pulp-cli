@@ -103,7 +103,7 @@ class Pulp {
 	}
 
 	public function watch($fileList, $opts=NULL) {
-		$w =  new Watch($fileList, $this->loop);
+		$w =  new Watch($this->loop, $fileList, $opts);
 		$this->watchList[] = $w;
 		return $w;
 	}

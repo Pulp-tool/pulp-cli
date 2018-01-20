@@ -14,22 +14,46 @@ class Watch extends EventEmitter {
 	public $wdToRealPath  = [];
 	public $wdToGlob      = [];
 	public $fsWatcherList = [];
-	public $cwd;
+	public $sourceList    = [];
+	public $workdir;
 
-	public function __construct($fileList, $loop) {
+	public function __construct($loop, $fileList, $opts=NULL) {
+		$this->loop       = $loop;
+		$this->sourceList = $fileList;
 
-		$this->cwd = getcwd();
+		if (!is_array($this->sourceList)) {
+			$this->sourceList = array($this->sourceList);
+		}
+		if (!is_array($opts)) {
+			$opts = array($opts);
+		}
+		if (!array_key_exists('cwd', $opts)) {
+			$opts['cwd'] = getcwd();
+		}
+		$this->workdir = $opts['cwd'];
+		$this->opts    = $opts;
+
+
 		if (extension_loaded('inotify')) {
-			$this->setupInotify($fileList, $loop);
+			$this->setupInotify();
 		} else {
-			$this->setupPoller($fileList, $loop);
+			$this->setupPoller();
 		}
 	}
 
-	public function setupPoller($fileList, $loop) {
+	public function setupPoller($loop=NULL, $fileList=NULL) {
+		if ($loop != NULL) {
+			$this->loop = $loop;
+		}
+		if ($fileList != NULL) {
+			$this->sourceList = $fileList;
+			if (!is_array($this->sourceList)) {
+				$this->sourceList = array($this->sourceList);
+			}
+		}
 
-		foreach ($fileList as $_glob) {
-			$s =  new SourceList($loop, $_glob, []);
+		foreach ($this->sourceList as $_glob) {
+			$s =  new SourceList($this->loop, $_glob, []);
 			$s->on('log', function($data,$params) {
 				$this->log($data, $params);
 			});
@@ -42,7 +66,7 @@ class Watch extends EventEmitter {
 
 		$watcherList = $this->fsWatcherList;
 
-		$loop->addPeriodicTimer(1.03, function() use ($watcherList, $loop) {
+		$this->loop->addPeriodicTimer(1.03, function() use ($watcherList) {
 
 			foreach ($watcherList as $_glob => $_src) {
 				//TODO: remove existing watchers
@@ -53,10 +77,19 @@ class Watch extends EventEmitter {
 		});
 	}
 
-	public function setupInotify($fileList, $loop) {
+	public function setupInotify($loop=NULL, $fileList=NULL) {
+		if ($loop != NULL) {
+			$this->loop = $loop;
+		}
+		if ($fileList != NULL) {
+			$this->sourceList = $fileList;
+			if (!is_array($this->sourceList)) {
+				$this->sourceList = array($this->sourceList);
+			}
+		}
 
 		$this->inotifyFd = \inotify_init();
-		foreach ($fileList as $_filePattern) {
+		foreach ($this->sourceList as $_filePattern) {
 			$gs = new Fs\GlobStream($_filePattern);
 
 			$wd = \inotify_add_watch($this->inotifyFd, $gs->root, IN_MODIFY|IN_CLOSE_WRITE);
@@ -73,7 +106,7 @@ class Watch extends EventEmitter {
 		$wdToRealPath = $this->wdToRealPath;
 		$wdToGlob     = $this->wdToGlob;
 
-		$loop->addReadStream($this->inotifyFd, function($stream) use ($fileList, $wdToRealPath, $wdToGlob) {
+		$this->loop->addReadStream($this->inotifyFd, function($stream) use ($fileList, $wdToRealPath, $wdToGlob) {
 			$ievent = \inotify_read($stream);
 			if ($ievent == FALSE) {
 				return;
