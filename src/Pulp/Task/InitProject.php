@@ -25,23 +25,22 @@ use \Pulp\Less       as less;
 \$p = new \Pulp\Pulp();
 
 \$watchDirsCode = ['src/**/*.php'];
-\$watchDirsLess = ['public/templates/**/*.less'];
-\$outputDirLess =  'public/templates/dist/css/';
+\$watchDirsCss  = ['public/templates/**/*.less'];
+\$outputDirCss  =  'public/templates/dist/css/';
 
 
-\$p->task('watch', function() use(\$p, \$watchDirsCode, \$watchDirsLess, \$outputDirLess) {
+\$p->task('watch', function() use(\$p, \$watchDirsCode, \$watchDirsCss, \$outputDirCss) {
 	\$lr = new lr();
 	\$lr->listen(\$p->loop);
 
 	\$p->watch( \$watchDirsCode )->on('change', function(\$file) use (\$p) {
-		\$p->src(\$watchDirsCode)
-			->pipe(\$lr);
+		$lr->fileChanged($file);
 	});
 
-	\$p->watch( \$watchDirsLess )->on('change', function(\$file) use (\$p, \$outputDirLess) {
-		\$p->src(\$watchDirsLess)
+	\$p->watch( \$watchDirsCss )->on('change', function(\$file) use (\$p, \$watchDirsCss, \$outputDirCss) {
+		\$p->src(\$watchDirsCss)
 			->pipe(new less( ['compress'=>TRUE] ))
-			->pipe(\$p->dest(\$outputDirLess))
+			->pipe(\$p->dest(\$outputDirCss))
 			->pipe(\$lr);
 	});
 });
