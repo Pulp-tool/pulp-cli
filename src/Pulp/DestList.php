@@ -34,10 +34,11 @@ class DestList extends DataPipe {
 	 */
 	public function _onWrite($file) {
 		foreach ($this->destList as $_dest) {
-			$outputPath = Fs\Path\resolve($this->workdir, $_dest, $file->getPartialFilename() );
+			$newBase = Fs\Path\resolve($_dest);
+			$outputPath = Fs\Path\resolve($_dest, $file->getPartialFilename() );
 			Fs\Path\mkdirp($outputPath);
 			file_put_contents($outputPath, $file->getContents());
-			$file->setPathname($outputPath);
+			$file->setPathname($outputPath, ['base'=>$newBase]);
 			$this->emit('data', [$file]);
 		}
 	}

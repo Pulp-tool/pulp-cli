@@ -44,7 +44,7 @@ function relative($from, $to) {
 		//from: /usr/local/bin
 		//to:   /usr/local/lib
 
-		$path = $fromOrig. '/'. implode('/', array_fill(0, $x-1, '..'));
+		$path = $fromOrig. '/'. implode('/', array_fill(0, $fromLen -$x +1, '..'));
 		if ($x > 1) {
 			$path .= '/';
 		}

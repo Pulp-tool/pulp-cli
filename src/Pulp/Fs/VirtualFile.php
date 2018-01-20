@@ -11,15 +11,7 @@ class VirtualFile { // extends \SplFileInfo {
 
 
 	public function __construct($fname, $opts=[]) {
-		$this->setPathname($fname);
-		$pathInfo = $this->getPathInfo();
-		$defaults = array_merge(
-			[
-			'base'=>$pathInfo->getPathname(),
-			],
-			$opts
-		);
-		$this->base  = $defaults['base'];
+		$this->setPathname($fname, $opts);
 	}
 
 	public function getPartialPathname() {
@@ -32,10 +24,15 @@ class VirtualFile { // extends \SplFileInfo {
 	 */
 	public function getPartialFilename() {
 		$fullPath = $this->getPathname();
-		if ($this->base !== '.') {
-			$partial  = str_replace($this->base, '', $fullPath);
-		} else {
+		if ($this->base === '.') {
 			$partial = $fullPath;
+		} else {
+			if (substr($this->base, 0, 2) == './') {
+				$b = str_replace('./', '', $this->base);
+			} else {
+				$b = $this->base;
+			}
+			$partial  = str_replace($b, '', $fullPath);
 		}
 		//partials should never begin with /
 		$partial = ltrim($partial, '/');
@@ -51,8 +48,16 @@ class VirtualFile { // extends \SplFileInfo {
 		return $this->contents;
 	}
 
-	public function setPathname($newPath) {
+	public function setPathname($newPath, $opts=[]) {
 		$this->spl = new \SplFileInfo($newPath);
+		$pathInfo = $this->getPathInfo();
+		$defaults = array_merge(
+			[
+			'base'=>$pathInfo->getPathname(),
+			],
+			$opts
+		);
+		$this->base  = $defaults['base'];
 	}
 
 	public function __call($name, $args) {
