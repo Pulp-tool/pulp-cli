@@ -179,11 +179,15 @@ class Pulp {
 			$this->error($e->getMessage());
 		}
 
-		try {
-			$this->loop->run();
-		} catch (\Exception $e) {
-			$this->error($e->getMessage());
-			$this->error($e->getTraceAsString());
+		$running = TRUE;
+		while ($running) {
+			try {
+				$this->loop->run();
+				$running = FALSE;
+			} catch (\Exception $e) {
+				$this->error($e->getMessage());
+				$this->error($e->getTraceAsString());
+			}
 		}
 	}
 
