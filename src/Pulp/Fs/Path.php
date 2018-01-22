@@ -25,7 +25,7 @@ function relative($from, $to) {
 			//from: /usr/local/bin
 			//to:   /usr/local
 
-			return $fromOrig. '/'. implode('/', array_fill(0, ($toLen - $x)+1, '..'));
+			return $fromOrig. '/'. implode('/', array_fill(0, ($fromLen - $x), '..'));
 		}
 		
 		if ($fromParts[$x] == $toParts[$x]) {
@@ -33,18 +33,31 @@ function relative($from, $to) {
 		}
 
 		//we get here if
-		//from: /usr
+		//from: /usr/bin
+		//to:   /usr/local/bin
+		//or
+		//from: /usr/local/lib
 		//to:   /usr/local/bin
 		break;
 	}
+
 	$diff  = $toLen - $fromLen;
+	if ($diff < 1) {
+		$newPath = $fromOrig. '/'. implode('/', array_fill(0, ( ($fromLen -$x) ), '..'));
+		//back-up if toLen is greater than $x
+		if ($toLen > $x) {
+			$newPath .= '/'.implode('/', array_slice($toParts, $x));
+		}
+		return $newPath;
+	}
+
 	$path = $fromOrig.'/';
 	if ($toLen == $fromLen) {
 		//we get here if
 		//from: /usr/local/bin
 		//to:   /usr/local/lib
 
-		$path = $fromOrig. '/'. implode('/', array_fill(0, $fromLen -$x +1, '..'));
+		$path = $fromOrig. '/'. implode('/', array_fill(0, $fromLen -$x , '..'));
 		if ($x > 1) {
 			$path .= '/';
 		}

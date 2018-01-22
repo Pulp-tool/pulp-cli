@@ -31,4 +31,9 @@ class Pulp_Fs_PathTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($expected, $x);
 	}
 
+	public function test_relative_goes_up_then_down_more_than_once() {
+		$expected = getcwd().'/tests/unit/../../src';
+		$x = \Pulp\Fs\Path\relative( getcwd().'/tests/unit/', getcwd().'/src/' );
+		$this->assertEquals($expected, $x);
+	}
 }
