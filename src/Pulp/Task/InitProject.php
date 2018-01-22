@@ -34,7 +34,7 @@ use \Pulp\Less       as less;
 	\$lr->listen(\$p->loop);
 
 	\$p->watch( \$watchDirsCode )->on('change', function(\$file) use (\$p) {
-		$lr->fileChanged($file);
+		\$lr->fileChanged(\$file);
 	});
 
 	\$p->watch( \$watchDirsCss )->on('change', function(\$file) use (\$p, \$watchDirsCss, \$outputDirCss) {
