@@ -11,7 +11,7 @@
 		"files": [ "src/Pulp/Fs/Path.php" ]
     },
 
-	"bin": ["bin/altax"],
+	"bin": ["bin/pulp"],
 
     "authors": [
         {
