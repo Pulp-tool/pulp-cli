@@ -1,6 +1,6 @@
 {
     "name": "Pulp-tool/pulp-cli",
-	"version": "0.13.0",
+	"version": "0.13.1",
 
     "require": {
         "react/stream": "^0.7.6",
