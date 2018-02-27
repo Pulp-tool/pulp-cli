@@ -68,7 +68,7 @@ class Pulp_Fs_GlobStreamTest extends \PHPUnit\Framework\TestCase {
 
 		$gs = new \Pulp\Fs\GlobStream($this->rootDir.'subd1/baz.txt');
 		$x = $gs->compileRegex($filename);
-		$this->assertEquals('~(tests)/(testroot)/(subd1)/(baz.txt)~', $x);
+		$this->assertEquals('~(tests)/(testroot)/(subd1)/(baz\.txt)~', $x);
 
 	}
 
