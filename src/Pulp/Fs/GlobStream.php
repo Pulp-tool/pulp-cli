@@ -154,7 +154,7 @@ class GlobStream extends \Pulp\DataPipe {
 			}
 
 
-			$regex .= '('.$_p.')/';
+			$regex .= '('.preg_quote($_p).')/';
 		}
 		//remove trailing dir separator
 		$regex = rtrim($regex, '/');
