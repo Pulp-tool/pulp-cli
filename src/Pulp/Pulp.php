@@ -41,7 +41,7 @@ class Pulp {
 	}
 
 	public function output($msg, $params = array()) {
-		if (count($params)) {
+		if (@count($params)) {
 			$msg = vsprintf($msg, $params);
 		}
 		$msg = sprintf ("[<meta>%s</>] %s\n", date('H:i:s'), $msg);
