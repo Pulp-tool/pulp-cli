@@ -79,6 +79,12 @@ class SourceList extends DataPipe {
 	public function readOneFile() {
 		foreach ($this->sourceList as $_src) {
 
+			//handle objects of Fs\VirtualFiles
+			//these can be injected from watch()
+			if (is_object($_src) && $_src instanceof Fs\VirtualFile) {
+				yield $_src;
+				continue;
+			}
 			$stream = new \Pulp\Fs\GlobStream($_src);
 			$base   = $stream->getGlobParent();
 			$opts   = $this->opts;

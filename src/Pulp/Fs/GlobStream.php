@@ -105,16 +105,29 @@ class GlobStream extends \Pulp\DataPipe {
 		return $ret;
 	}
 
+	/**
+	 * find the parent of any supplied path that
+	 * is not a glob
+	 */
 	public function findStaticParent($glob) {
+		//if the end is a slash, this is its own parent
 		if (substr($glob, -1) == '/') {
 			return $glob;
 		}
 
+		//no directories?  use current
+		if (strpos($glob, '/') === FALSE) {
+			return '.';
+		}
+
+		//TODO: should this be ltrim?  we'll never get
+		//a use for rtirm with the first substr -1 call
 		$fileParts = explode('/', rtrim($glob, '/'));
+
 		array_pop($fileParts);
+
 		return implode('/', $fileParts);
 	}
-
 
 	public function fileMatchesGlob($name, $glob=NULL) {
 		if ($glob != NULL) {
