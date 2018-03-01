@@ -56,6 +56,10 @@ class Pulp {
 		$this->_log('ERROR', '<error>ERROR:</> '.$msg, $params);
 	}
 
+	public function debug($msg, $params = array()) {
+		$this->_log('DEBUG', '<meta>DEBUG:</> '.$msg, $params);
+	}
+
 	public function _log($level, $msg, $params = array()) {
 		$this->output($msg, $params);
 	}
