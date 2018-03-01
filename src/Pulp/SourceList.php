@@ -14,6 +14,9 @@ class SourceList extends DataPipe {
 	public $sourceList;
 	public $workdir = '.';
 	public $opts    = [];
+	/**
+	 * @deprecated
+	 */
 	public $loop    = NULL;
 	public $started = FALSE;
 	protected $generator;
@@ -41,6 +44,8 @@ class SourceList extends DataPipe {
 	public function resume() {
 		if (!$this->closed && !$this->started) {
 			$this->started = TRUE;
+		}
+		if ($this->started) {
 			$this->tickSourceFile();
 		}
 	}
@@ -65,9 +70,11 @@ class SourceList extends DataPipe {
 		$this->emit('data', [$file]);
 		$this->generator->next();
 
-        if (!$this->closed) {
+		/*
+        if (!$this->closed && is_object($this->loop)) {
 			$this->loop->futureTick([$this, 'tickSourceFile']);
 		}
+		 */
 		if ($this->closed) {
 			$this->generator = NULL;
 		}

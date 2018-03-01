@@ -195,10 +195,19 @@ class Pulp {
 
 	/**
 	 * Call resume on all defined sources.
+	 * Because the loop doesn't cover React-Streams (only PHP native streams)
+	 * We have to constantly re-inject ourselves
 	 */
 	public function flushSources() {
+		$openSrc = FALSE;
 		foreach ($this->sourceList as $_s) {
 			$_s->resume();
+			if ($_s->isReadable()) {
+				$openSrc = TRUE;
+			}
+		}
+		if ($openSrc) {
+			$this->loop->futureTick([$this, 'flushSources']);
 		}
 	}
 }
