@@ -17,9 +17,10 @@ class Watch extends EventEmitter {
 	public $sourceList    = [];
 	public $workdir;
 
-	public function __construct($loop, $fileList, $opts=NULL) {
-		$this->loop       = $loop;
-		$this->sourceList = $fileList;
+	public function __construct($loop, $fileList, $cb, $opts=NULL) {
+		$this->loop          = $loop;
+		$this->sourceList    = $fileList;
+		$this->flushCallback = $cb;
 
 		if (!is_array($this->sourceList)) {
 			$this->sourceList = array($this->sourceList);
@@ -73,6 +74,8 @@ class Watch extends EventEmitter {
 				$_src->closed  = FALSE;
 				$_src->started = FALSE;
 				$_src->resume();
+
+				$this->loop->futureTick( $this->flushCallback );
 			}
 		});
 	}

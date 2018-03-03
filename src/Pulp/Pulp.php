@@ -109,7 +109,7 @@ class Pulp {
 	}
 
 	public function watch($fileList, $opts=NULL) {
-		$w =  new Watch($this->loop, $fileList, $opts);
+		$w =  new Watch($this->loop, $fileList, [$this, 'flushSources'], $opts);
 		$this->watchList[] = $w;
 		return $w;
 	}
@@ -203,13 +203,24 @@ class Pulp {
 	 * We have to constantly re-inject ourselves
 	 */
 	public function flushSources() {
-		$openSrc = FALSE;
+		$openSrc      = FALSE;
+		//$this->debug( "flusing source list...\n");
 		foreach ($this->sourceList as $_s) {
-			$_s->resume();
 			if ($_s->isReadable()) {
+				$_s->resume();
 				$openSrc = TRUE;
 			}
 		}
+		foreach ($this->watchList as $_w) {
+			foreach ($_w->fsWatcherList as $_s) {
+				if ($_s->isReadable()) {
+		//			$this->debug( "watcher source is readable ...\n");
+					$_s->resume();
+					$openSrc = TRUE;
+				}
+			}
+		}
+
 		if ($openSrc) {
 			$this->loop->futureTick([$this, 'flushSources']);
 		}
