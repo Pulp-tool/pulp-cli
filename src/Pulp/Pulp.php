@@ -6,7 +6,7 @@ use \React\Stream\ReadableStreamInterface;
 class Pulp {
 
 	public $loop;
-	public $watchList;
+	public $watchList  = [];
 	public $sourceList = [];
 	public $flags      = [];
 	public $color = TRUE;
